@@ -332,6 +332,13 @@ rep cmpsw
 rep scasw
 rep lodsw
 
+; NOTE(casey): Special thanks (as always!) to Mārtiņš Možeiko for figuring out why NASM 
+; wouldn't compile "rep stds" instructions. It was because it was a misprint in the 8086
+; manual! It was really just "rep stos", which of course is still in x64, and NASM
+; assembles it just fine.
+rep stosb
+rep stosw
+
 call [39201]
 call [bp - 100]
 call sp
@@ -407,14 +414,6 @@ lock not byte CS:[bp + 9905]
 ; print the esc instruction and NASM will error because it doesn't know what that is.
 ;
 ; esc 938,ax
-;
-
-;
-; TODO(casey): For some reason, stds doesn't seem to be supported by NASM, unlike the rest of the REP operations.
-; Perhaps I am just asking wrong, but for now these are commented out as NASM doesn't recognize them.
-;
-; rep stdsb
-; rep stdsw
 ;
 
 ;
