@@ -10,6 +10,31 @@
    
    ======================================================================== */
 
+enum instruction_bits_usage : u8
+{
+    Bits_Literal,
+    Bits_MOD,
+    Bits_REG,
+    Bits_RM,
+    Bits_SR,
+    Bits_Disp,
+    Bits_Data,
+
+    Bits_HasDisp,
+    Bits_DispAlwaysW,
+    Bits_HasData,
+    Bits_WMakesDataW,
+    Bits_RMRegAlwaysW,
+    Bits_RelJMPDisp,
+    Bits_D,
+    Bits_S,
+    Bits_W,
+    Bits_V,
+    Bits_Z,
+    
+    Bits_Count,
+};
+
 struct instruction_bits
 {
     instruction_bits_usage Usage;
