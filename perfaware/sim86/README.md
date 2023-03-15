@@ -6,4 +6,4 @@ However, should you wish to use this code as a starting point for future homewor
 
 ### Tags:
 
-**Part1_0_SlowDecode**: No simulation, just decoding. The decoding works directly off a transcription of the table from the 8086 manual, with no attempt to accelerate it, so decoding is quite slow (compared to what we could expect if we used a lookup). After instructions are decoded, they are printed to the console in Intel ASM syntax.
+**Part1_0_SlowDecode**: No simulation, just decoding. The decoding works directly off a transcription of the table from the 8086 manual, with no attempt to accelerate it, so decoding is quite slow (compared to what we could expect if we used a lookup). After instructions are decoded, they are printed to the console in Intel ASM syntax. This decoder is only tested to guarantee binary-exact reassembly up through [ASM listing 42](../part1/listing_0042_completionist_decode.asm), and may fail on 8086 machine code not covered by those tests.
