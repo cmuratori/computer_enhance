@@ -332,7 +332,7 @@ rep cmpsw
 rep scasw
 rep lodsw
 
-; NOTE(casey): Special thanks (as always!) to Mārtiņš Možeiko for figuring out why NASM 
+; NOTE(casey): Special thanks (as always!) to Mārtiņš Možeiko for figuring out why NASM
 ; wouldn't compile "rep stds" instructions. It was because it was a misprint in the 8086
 ; manual! It was really just "rep stos", which of course is still in x64, and NASM
 ; assembles it just fine.
@@ -376,7 +376,7 @@ loopnz label
 jcxz label
     
 int 13
-int 3
+int3
     
 into
 iret
@@ -407,6 +407,14 @@ test byte cs:[bp - 39], 239
 sbb word cs:[bx + si - 4332], 10328
 
 lock not byte CS:[bp + 9905]
+
+;
+; NOTE(casey): These were not in the original homework set, but have been added since, as people
+; found instruction encodings that were not previously covered
+;
+
+call 123:456
+jmp 789:34
 
 ;
 ; TODO(casey): I would like to uncomment this, but as far as I can tell, NASM doesn't recognize the ESC instruction :(
