@@ -12,10 +12,14 @@
 
 #include "sim86.h"
 
+#include "sim86_instruction_table.h"
+#include "sim86_instruction.h"
 #include "sim86_memory.h"
 #include "sim86_text.h"
 #include "sim86_decode.h"
 
+#include "sim86_instruction_table.cpp"
+#include "sim86_instruction.cpp"
 #include "sim86_memory.cpp"
 #include "sim86_text.cpp"
 #include "sim86_decode.cpp"
@@ -24,12 +28,13 @@ static void DisAsm8086(memory *Memory, u32 DisAsmByteCount, segmented_access Dis
 {
     segmented_access At = DisAsmStart;
     
-    disasm_context Context = DefaultDisAsmContext();
+    decode_context Context = {};
+    instruction_table Table = Get8086InstructionTable();
     
     u32 Count = DisAsmByteCount;
     while(Count)
     {
-        instruction Instruction = DecodeInstruction(&Context, Memory, &At);
+        instruction Instruction = DecodeInstruction(&Context, Table, Memory, &At);
         if(Instruction.Op)
         {
             if(Count >= Instruction.Size)
@@ -42,7 +47,6 @@ static void DisAsm8086(memory *Memory, u32 DisAsmByteCount, segmented_access Dis
                 break;
             }
             
-            UpdateContext(&Context, Instruction);
             if(IsPrintable(Instruction))
             {
                 PrintInstruction(Instruction, stdout);

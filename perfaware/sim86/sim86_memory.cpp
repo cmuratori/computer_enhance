@@ -1,7 +1,7 @@
 /* ========================================================================
    $File: work/tools/sim86/sim86_memory.cpp $
-   $Date: 2023/03/15 08:30:12 UTC $
-   $Revision: 2 $
+   $Date: 2023/03/17 00:56:57 UTC $
+   $Revision: 3 $
    $Creator: Casey Muratori $
    $Notice: (C) Copyright by Molly Rocket, Inc., All Rights Reserved. $
    ======================================================================== */
@@ -31,8 +31,8 @@ static u32 LoadMemoryFromFile(char *FileName, memory *Memory, u32 AtOffset)
     
     if(AtOffset < ArrayCount(Memory->Bytes))
     {
-        FILE *File = {};
-        if(fopen_s(&File, FileName, "rb") == 0)
+        FILE *File = fopen(FileName, "rb");
+        if(File)
         {
             Result = fread(Memory->Bytes + AtOffset, 1, ArrayCount(Memory->Bytes) - AtOffset, File);
             fclose(File);

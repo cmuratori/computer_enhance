@@ -10,21 +10,6 @@
    
    ======================================================================== */
 
-char const *OpcodeMnemonics[] =
-{
-    "",
-
-#define INST(Mnemonic, ...) #Mnemonic,
-#define INSTALT(...)
-#include "sim86_instruction_table.inl"
-};
-
-static char const *GetMnemonic(operation_type Op)
-{
-    char const *Result = OpcodeMnemonics[Op];
-    return Result;
-}
-
 static char const *GetRegName(register_access Reg)
 {
     char const *Names[][3] =
@@ -51,25 +36,6 @@ static char const *GetRegName(register_access Reg)
     return Result;
 }
 
-static char const *GetEffectiveAddressExpression(effective_address_expression Address)
-{
-    char const *RMBase[] =
-    {
-        "",
-        "bx+si",
-        "bx+di",
-        "bp+si",
-        "bp+di",
-        "si",
-        "di",
-        "bp",
-        "bx",
-    };
-    static_assert(ArrayCount(RMBase) == EffectiveAddress_count, "Text table mismatch for effective_base_address");
-    char const *Result = RMBase[Address.Base];
-    return Result;
-}
-
 static b32 IsPrintable(instruction Instruction)
 {
     b32 Result = !((Instruction.Op == Op_lock) ||
@@ -77,6 +43,27 @@ static b32 IsPrintable(instruction Instruction)
                    (Instruction.Op == Op_segment));
     
     return Result;
+}
+
+static void PrintEffectiveAddressExpression(effective_address_expression Address, FILE *Dest)
+{
+    char const *Separator = "";
+    for(u32 Index = 0; Index < ArrayCount(Address.Terms); ++Index)
+    {
+        effective_address_term Term = Address.Terms[Index];
+        register_access Reg = Term.Register;
+        
+        if(Reg.Index)
+        {
+            fprintf(Dest, "%s%s", Separator, GetRegName(Reg));
+            Separator = "+";
+        }
+    }
+    
+    if(Address.Displacement != 0)
+    {
+        fprintf(Dest, "%+d", Address.Displacement);
+    }
 }
 
 static void PrintInstruction(instruction Instruction, FILE *Dest)
@@ -127,32 +114,39 @@ static void PrintInstruction(instruction Instruction, FILE *Dest)
                 {
                     effective_address_expression Address = Operand.Address;
 
-                    if(Instruction.Operands[0].Type != Operand_Register)
+                    if(Address.Segment)
                     {
-                        fprintf(Dest, "%s ", W ? "word" : "byte");
+                        if(Instruction.Operands[0].Type != Operand_Register)
+                        {
+                            fprintf(Dest, "%s ", W ? "word" : "byte");
+                        }
+                        
+                        if(Flags & Inst_Segment)
+                        {
+                            printf("%s:", GetRegName({Address.Segment, 0, 2}));
+                        }
+                        
+                        fprintf(Dest, "[");
+                        PrintEffectiveAddressExpression(Address, Dest);
+                        fprintf(Dest, "]");
                     }
-                    
-                    if(Flags & Inst_Segment)
+                    else
                     {
-                        printf("%s:", GetRegName({Address.Segment, 0, 2}));
+                        fprintf(Dest, "%u:%u", Address.ExplicitSegment, Address.Displacement);
                     }
-                    
-                    fprintf(Dest, "[%s", GetEffectiveAddressExpression(Address));
-                    if(Address.Displacement != 0)
-                    {
-                        fprintf(Dest, "%+d", Address.Displacement);
-                    }
-                    fprintf(Dest, "]");
                 } break;
                 
                 case Operand_Immediate:
                 {
-                    fprintf(Dest, "%d", Operand.ImmediateS32);
-                } break;
-                
-                case Operand_RelativeImmediate:
-                {
-                    fprintf(Dest, "$%+d", Operand.ImmediateS32);
+                    immediate Immediate = Operand.Immediate;
+                    if(Immediate.Relative)
+                    {
+                        fprintf(Dest, "$%+d", Immediate.Value + Instruction.Size);
+                    }
+                    else
+                    {
+                        fprintf(Dest, "%d", Immediate.Value);
+                    }
                 } break;
             }
         }

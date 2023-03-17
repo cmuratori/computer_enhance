@@ -49,9 +49,9 @@
 #define ImpD(Value) {Bits_D, 0, 0, Value}
 #define ImpS(Value) {Bits_S, 0, 0, Value}
     
-#define DISP {Bits_HasDisp, 0, 0, 1}
-#define ADDR {Bits_HasDisp, 0, 0, 1}, {Bits_DispAlwaysW, 0, 0, 1}
-#define DATA {Bits_HasData, 0, 0, 1}
+#define DISP {Bits_Disp, 0, 0, 0}
+#define ADDR {Bits_Disp, 0, 0, 0}, {Bits_DispAlwaysW, 0, 0, 1}
+#define DATA {Bits_Data, 0, 0, 0}
 #define DATA_IF_W {Bits_WMakesDataW, 0, 0, 1}
 #define Flags(F) {F, 0, 0, 1}
 
@@ -163,13 +163,13 @@ INST(stos, {B(1010101), W})
 
 INST(call, {B(11101000), ADDR})
 INSTALT(call, {B(11111111), MOD, B(010), RM, ImpW(1)})
-INSTALT(call, {B(10011010), ADDR, DATA, ImpW(1)})
+INSTALT(call, {B(10011010), ADDR, DATA, DATA_IF_W, ImpW(1)})
 INSTALT(call, {B(11111111), MOD, B(011), RM, ImpW(1)})
 
 INST(jmp, {B(11101001), ADDR})
 INSTALT(jmp, {B(11101011), DISP})
 INSTALT(jmp, {B(11111111), MOD, B(100), RM, ImpW(1)})
-INSTALT(jmp, {B(11101010), ADDR, DATA, ImpW(1)})
+INSTALT(jmp, {B(11101010), ADDR, DATA, DATA_IF_W, ImpW(1)})
 INSTALT(jmp, {B(11111111), MOD, B(101), RM, ImpW(1)})
 
 INST(ret, {B(11000011)})
