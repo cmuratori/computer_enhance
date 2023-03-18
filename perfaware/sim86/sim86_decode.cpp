@@ -10,6 +10,34 @@
    
    ======================================================================== */
 
+enum register_mapping_8086
+{
+    Register_none,
+    
+    Register_a,
+    Register_b,
+    Register_c,
+    Register_d,
+    Register_sp,
+    Register_bp,
+    Register_si,
+    Register_di,
+    Register_es,
+    Register_cs,
+    Register_ss,
+    Register_ds,
+    Register_ip,
+    Register_flags,
+    
+    Register_count,
+};
+
+struct decode_context
+{
+    u32 DefaultSegment;
+    u32 AdditionalFlags;
+};
+
 static instruction_operand GetRegOperand(u32 IntelRegIndex, b32 Wide)
 {
     // NOTE(casey): This maps Intel's REG and RM field encodings for registers to our encoding for registers.
@@ -35,7 +63,7 @@ static instruction_operand GetRegOperand(u32 IntelRegIndex, b32 Wide)
 // NOTE(casey): ParseDataValue is not a real function, it's basically just a macro that is used in
 // TryParse. It should never be called otherwise, but that is not something you can do in C++.
 // In other languages it would be a "local function".
-static u32 ParseDataValue(memory *Memory, segmented_access *Access, b32 Exists, b32 Wide, b32 SignExtended)
+static u32 ParseDataValue(segmented_access *Access, b32 Exists, b32 Wide, b32 SignExtended)
 {
     u32 Result = {};
     
@@ -43,14 +71,14 @@ static u32 ParseDataValue(memory *Memory, segmented_access *Access, b32 Exists, 
     {
         if(Wide)
         {
-            u8 D0 = ReadMemory(Memory, GetAbsoluteAddressOf(*Access, 0));
-            u8 D1 = ReadMemory(Memory, GetAbsoluteAddressOf(*Access, 1));
+            u8 D0 = *AccessMemory(*Access, 0);
+            u8 D1 = *AccessMemory(*Access, 1);
             Result = (D1 << 8) | D0;
             Access->SegmentOffset += 2;
         }
         else
         {
-            Result = ReadMemory(Memory, GetAbsoluteAddressOf(*Access));
+            Result = *AccessMemory(*Access);
             if(SignExtended)
             {
                 Result = (s32)*(s8 *)&Result;
@@ -62,14 +90,14 @@ static u32 ParseDataValue(memory *Memory, segmented_access *Access, b32 Exists, 
     return Result;
 }
 
-static instruction TryDecode(decode_context *Context, instruction_encoding *Inst, memory *Memory, segmented_access At)
+static instruction TryDecode(decode_context *Context, instruction_encoding *Inst, segmented_access At)
 {
     instruction Dest = {};
     b32 Has[Bits_Count] = {};
     u32 Bits[Bits_Count] = {};
     b32 Valid = true;
     
-    u32 StartingAddress = GetAbsoluteAddressOf(At);
+    u64 StartingAddress = GetAbsoluteAddressOf(At);
     
     u8 BitsPendingCount = 0;
     u8 BitsPending = 0;
@@ -88,7 +116,7 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
             if(BitsPendingCount == 0)
             {
                 BitsPendingCount = 8;
-                BitsPending = ReadMemory(Memory, GetAbsoluteAddressOf(At));
+                BitsPending = *AccessMemory(At);
                 ++At.SegmentOffset;
             }
             
@@ -129,16 +157,23 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
         b32 DisplacementIsW = ((Bits[Bits_DispAlwaysW]) || (Mod == 0b10) || HasDirectAddress);
         b32 DataIsW = ((Bits[Bits_WMakesDataW]) && !S && W);
         
-        Bits[Bits_Disp] |= ParseDataValue(Memory, &At, Has[Bits_Disp], DisplacementIsW, (!DisplacementIsW));
-        Bits[Bits_Data] |= ParseDataValue(Memory, &At, Has[Bits_Data], DataIsW, S);
+        Bits[Bits_Disp] |= ParseDataValue(&At, Has[Bits_Disp], DisplacementIsW, (!DisplacementIsW));
+        Bits[Bits_Data] |= ParseDataValue(&At, Has[Bits_Data], DataIsW, S);
         
         Dest.Op = Inst->Op;
         Dest.Flags = Context->AdditionalFlags;
         Dest.Address = StartingAddress;
         Dest.Size = GetAbsoluteAddressOf(At) - StartingAddress;
+        Dest.SegmentOverride = Context->DefaultSegment;
+        
         if(W)
         {
             Dest.Flags |= Inst_Wide;
+        }
+
+        if(Bits[Bits_Far])
+        {
+            Dest.Flags |= Inst_Far;
         }
         
         u32 Disp = Bits[Bits_Disp];
@@ -149,7 +184,7 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
         
         if(Has[Bits_SR])
         {
-            *RegOperand = RegisterOperand((register_index)(Register_es + (Bits[Bits_SR] & 0x3)), 2);
+            *RegOperand = RegisterOperand(Register_es + (Bits[Bits_SR] & 0x3), 2);
         }
         
         if(Has[Bits_REG])
@@ -165,25 +200,19 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
             }
             else
             {
-                register_index IntelTerm0[8] = { Register_b,  Register_b, Register_bp, Register_bp, Register_si, Register_di, Register_bp, Register_b};
-                register_index IntelTerm1[8] = {Register_si, Register_di, Register_si, Register_di};
+                register_mapping_8086 IntelTerm0[8] = { Register_b,  Register_b, Register_bp, Register_bp, Register_si, Register_di, Register_bp, Register_b};
+                register_mapping_8086 IntelTerm1[8] = {Register_si, Register_di, Register_si, Register_di};
                 
                 u32 I = RM&0x7;
-                register_index Term0 = IntelTerm0[I];
-                register_index Term1 = IntelTerm1[I];
+                register_mapping_8086 Term0 = IntelTerm0[I];
+                register_mapping_8086 Term1 = IntelTerm1[I];
                 if((Mod == 0b00) && (RM == 0b110))
                 {
                     Term0 = {};
                     Term1 = {};
                 }
-
-                register_index Segment = Context->DefaultSegment;
-                if(!Segment)
-                {
-                    Segment = Register_ds;
-                }
                 
-                *ModOperand = EffectiveAddressOperand(Segment, RegisterAccess(Term0, 0, 2), RegisterAccess(Term1, 0, 2), Displacement);
+                *ModOperand = EffectiveAddressOperand(RegisterAccess(Term0, 0, 2), RegisterAccess(Term1, 0, 2), Displacement);
             }
         }
         
@@ -207,7 +236,7 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
             
             if(Bits[Bits_RelJMPDisp])
             {
-                *LastOperand = ImmediateOperandRelative(Displacement);
+                *LastOperand = ImmediateOperand(Displacement, Immediate_RelativeJumpDisplacement);
             }
             else if(Has[Bits_Data])
             {
@@ -230,7 +259,7 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
     return Dest;
 }
 
-static instruction DecodeInstruction(decode_context *Context, instruction_table Table, memory *Memory, segmented_access *At)
+static instruction DecodeInstruction(instruction_table Table, segmented_access At)
 {
     /* TODO(casey): Hmm. It seems like this is a very inefficient way to parse
        instructions, isn't it? For every instruction, we check every entry in the
@@ -238,36 +267,54 @@ static instruction DecodeInstruction(decode_context *Context, instruction_table 
        it know what they were doing, and has a plan for how it can be optimized
        later? Only time will tell... :) */
     
+    decode_context Context = {};
     instruction Result = {};
-    for(u32 Index = 0; Index < Table.EncodingCount; ++Index)
+    
+    u32 StartingAddress = GetAbsoluteAddressOf(At);
+    u32 TotalSize = 0;
+    while(TotalSize < Table.MaxInstructionByteCount)
     {
-        instruction_encoding Inst = Table.Encodings[Index];
-        Result = TryDecode(Context, &Inst, Memory, *At);
-        if(Result.Op)
+        Result = {};
+        for(u32 Index = 0; Index < Table.EncodingCount; ++Index)
         {
-            At->SegmentOffset += Result.Size;
+            instruction_encoding Inst = Table.Encodings[Index];
+            Result = TryDecode(&Context, &Inst, At);
+            if(Result.Op)
+            {
+                At.SegmentOffset += Result.Size;
+                TotalSize += Result.Size;
+                break;
+            }
+        }
+        
+        if(Result.Op == Op_lock)
+        {
+            Context.AdditionalFlags |= Inst_Lock;
+        }
+        else if(Result.Op == Op_rep)
+        {
+            Context.AdditionalFlags |= Inst_Rep;
+        }
+        else if(Result.Op == Op_segment)
+        {
+            Context.AdditionalFlags |= Inst_Segment;
+            Context.DefaultSegment = Result.Operands[1].Register.Index;
+        }
+        else
+        {
             break;
         }
     }
 
-    if(Result.Op == Op_lock)
+    if(TotalSize <= Table.MaxInstructionByteCount)
     {
-        Context->AdditionalFlags |= Inst_Lock;
-    }
-    else if(Result.Op == Op_rep)
-    {
-        Context->AdditionalFlags |= Inst_Rep;
-    }
-    else if(Result.Op == Op_segment)
-    {
-        Context->AdditionalFlags |= Inst_Segment;
-        Context->DefaultSegment = Result.Operands[1].Register.Index;
+        Result.Address = StartingAddress;
+        Result.Size = TotalSize;
     }
     else
     {
-        Context->AdditionalFlags = 0;
-        Context->DefaultSegment = Register_ds;
+        Result = {};
     }
-
+    
     return Result;
 }

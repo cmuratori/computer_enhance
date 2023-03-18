@@ -10,4 +10,20 @@
    
    ======================================================================== */
 
-static void PrintInstruction(instruction Instruction, FILE *Dest);
+enum operation_type : u32
+{
+    Op_None,
+
+#define INST(Mnemonic, ...) Op_##Mnemonic,
+#define INSTALT(...)
+#include "sim86_instruction_table.inl"
+    
+    Op_Count,
+};
+
+#include "sim86_instruction_table.h"
+
+instruction_encoding InstructionTable8086[] =
+{
+#include "sim86_instruction_table.inl"
+};

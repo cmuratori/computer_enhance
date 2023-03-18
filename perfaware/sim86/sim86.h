@@ -10,31 +10,18 @@
    
    ======================================================================== */
 
-/* NOTE(casey): _CRT_SECURE_NO_WARNINGS is here because otherwise we cannot
-   call fopen(). If we replace fopen() with fopen_s() to avoid the warning,
-   then the code doesn't compile on Linux anymore, since fopen_s() does not
-   exist there.
-   
-   What exactly the CRT maintainers were thinking when they made this choice,
-   I have no idea.
-*/
-#define _CRT_SECURE_NO_WARNINGS
+#define SIM86_VERSION 3
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
+typedef char unsigned u8;
+typedef short unsigned u16;
+typedef int unsigned u32;
+typedef long long unsigned u64;
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
+typedef char s8;
+typedef short s16;
+typedef int s32;
+typedef long long s64;
 
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-typedef int32_t b32;
+typedef s32 b32;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))

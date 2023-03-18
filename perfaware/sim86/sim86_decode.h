@@ -10,10 +10,4 @@
    
    ======================================================================== */
 
-struct decode_context
-{
-    register_index DefaultSegment;
-    u32 AdditionalFlags;
-};
-
-static instruction DecodeInstruction(decode_context *Context, instruction_table *Table, memory *Memory, segmented_access *At);
+static instruction DecodeInstruction(instruction_table Table, segmented_access At);

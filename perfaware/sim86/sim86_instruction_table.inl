@@ -60,7 +60,7 @@ INSTALT(mov, {B(1100011), W, MOD, B(000), RM, DATA, DATA_IF_W, ImpD(0)})
 INSTALT(mov, {B(1011), W, REG, DATA, DATA_IF_W, ImpD(1)})
 INSTALT(mov, {B(1010000), W, ADDR, ImpREG(0), ImpMOD(0), ImpRM(0b110), ImpD(1)})
 INSTALT(mov, {B(1010001), W, ADDR, ImpREG(0), ImpMOD(0), ImpRM(0b110), ImpD(0)})
-INSTALT(mov, {B(100011), D, B(0), MOD, B(0), SR, RM}) // NOTE(casey): This collapses 2 entries in the 8086 table by adding an explicit D bit
+INSTALT(mov, {B(100011), D, B(0), MOD, B(0), SR, RM, ImpW(1)}) // NOTE(casey): This collapses 2 entries in the 8086 table by adding an explicit D bit
 
 INST(push, {B(11111111), MOD, B(110), RM, ImpW(1)})
 INSTALT(push, {B(01010), REG, ImpW(1)})
@@ -116,13 +116,13 @@ INST(neg, {B(1111011), W, MOD, B(011), RM})
 
 INST(cmp, {B(001110), D, W, MOD, REG, RM})
 INSTALT(cmp, {B(100000), S, W, MOD, B(111), RM, DATA, DATA_IF_W})
-INSTALT(cmp, {B(0011110), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)}) // TODO(casey): The manual table suggests this data is only 8-bit, but wouldn't it be 16 as well?
+INSTALT(cmp, {B(0011110), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)}) // NOTE(casey): The manual table suggests this data is only 8-bit, but wouldn't it be 16 as well?
 
 INST(aas, {B(00111111)})
 INST(das, {B(00101111)})
 INST(mul, {B(1111011), W, MOD, B(100), RM, ImpS(0)})
 INST(imul, {B(1111011), W, MOD, B(101), RM, ImpS(1)})
-INST(aam, {B(11010100), B(00001010)}) // TODO(casey): The manual says this has a DISP... but how could it? What for??
+INST(aam, {B(11010100), B(00001010)}) // NOTE(casey): The manual says this has a DISP... but how could it? What for??
 INST(div, {B(1111011), W, MOD, B(110), RM, ImpS(0)})
 INST(idiv, {B(1111011), W, MOD, B(111), RM, ImpS(1)})
 INST(aad, {B(11010101), B(00001010)})
@@ -142,16 +142,16 @@ INST(and, {B(001000), D, W, MOD, REG, RM})
 INSTALT(and, {B(1000000), W, MOD, B(100), RM, DATA, DATA_IF_W})
 INSTALT(and, {B(0010010), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)})
 
-INST(test, {B(100001), D, W, MOD, REG, RM})
+INST(test, {B(1000010), W, MOD, REG, RM}) // NOTE(casey): The manual suggests there is a D flag here, but it doesn't appear to be true (it would conflict with xchg if it did)
 INSTALT(test, {B(1111011), W, MOD, B(000), RM, DATA, DATA_IF_W})
-INSTALT(test, {B(1010100), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)}) // TODO(casey): The manual table suggests this data is only 8-bit, but it seems like it could be 16 too?
+INSTALT(test, {B(1010100), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)}) // NOTE(casey): The manual table suggests this data is only 8-bit, but it seems like it could be 16 too?
 
 INST(or, {B(000010), D, W, MOD, REG, RM})
 INSTALT(or, {B(1000000), W, MOD, B(001), RM, DATA, DATA_IF_W})
 INSTALT(or, {B(0000110), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)})
 
 INST(xor, {B(001100), D, W, MOD, REG, RM})
-INSTALT(xor, {B(1000000), W, MOD, B(110), RM, DATA, DATA_IF_W}) // TODO(casey): The manual has conflicting information about this encoding, but I believe this is the correct binary pattern.
+INSTALT(xor, {B(1000000), W, MOD, B(110), RM, DATA, DATA_IF_W}) // NOTE(casey): The manual has conflicting information about this encoding, but I believe this is the correct binary pattern.
 INSTALT(xor, {B(0011010), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)})
 
 INST(rep, {B(1111001), Z})
@@ -161,21 +161,23 @@ INST(scas, {B(1010111), W})
 INST(lods, {B(1010110), W})
 INST(stos, {B(1010101), W})
 
-INST(call, {B(11101000), ADDR})
+INST(call, {B(11101000), ADDR, Flags(Bits_RelJMPDisp)})
 INSTALT(call, {B(11111111), MOD, B(010), RM, ImpW(1)})
 INSTALT(call, {B(10011010), ADDR, DATA, DATA_IF_W, ImpW(1)})
-INSTALT(call, {B(11111111), MOD, B(011), RM, ImpW(1)})
+INSTALT(call, {B(11111111), MOD, B(011), RM, ImpW(1), Flags(Bits_Far)})
 
-INST(jmp, {B(11101001), ADDR})
-INSTALT(jmp, {B(11101011), DISP})
+INST(jmp, {B(11101001), ADDR, Flags(Bits_RelJMPDisp)})
+INSTALT(jmp, {B(11101011), DISP, Flags(Bits_RelJMPDisp)})
 INSTALT(jmp, {B(11111111), MOD, B(100), RM, ImpW(1)})
 INSTALT(jmp, {B(11101010), ADDR, DATA, DATA_IF_W, ImpW(1)})
-INSTALT(jmp, {B(11111111), MOD, B(101), RM, ImpW(1)})
+INSTALT(jmp, {B(11111111), MOD, B(101), RM, ImpW(1), Flags(Bits_Far)})
 
+// NOTE(casey): The actual Intel manual does not distinguish mnemonics RET and RETF,
+// but NASM needs this to reassemble properly, so we do.
 INST(ret, {B(11000011)})
 INSTALT(ret, {B(11000010), DATA, DATA_IF_W, ImpW(1)})
-INSTALT(ret, {B(11001011)})
-INSTALT(ret, {B(11001010), DATA, DATA_IF_W, ImpW(1)})
+INST(retf, {B(11001011)})
+INSTALT(retf, {B(11001010), DATA, DATA_IF_W, ImpW(1)})
 
 INST(je, {B(01110100), DISP, Flags(Bits_RelJMPDisp)})
 INST(jl, {B(01111100), DISP, Flags(Bits_RelJMPDisp)})

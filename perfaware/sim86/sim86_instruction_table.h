@@ -10,17 +10,6 @@
    
    ======================================================================== */
 
-enum operation_type
-{
-    Op_None,
-
-#define INST(Mnemonic, ...) Op_##Mnemonic,
-#define INSTALT(...)
-#include "sim86_instruction_table.inl"
-    
-    Op_Count,
-};
-
 enum instruction_bits_usage : u8
 {
     Bits_End, // NOTE(casey): The 0 value, indicating the end of the instruction encoding array
@@ -44,6 +33,7 @@ enum instruction_bits_usage : u8
     Bits_WMakesDataW, // NOTE(casey): Tag for instructions where SW=01 makes the data field become 16 bits
     Bits_RMRegAlwaysW, // NOTE(casey): Tag for instructions where the register encoded in RM is always 16-bit width
     Bits_RelJMPDisp, // NOTE(casey): Tag for instructions that require address adjustment to go through NASM properly
+    Bits_Far, // NOTE(casey): Tag for instructions that require a "far" keyword in their ASM to select the right opcode
     
     Bits_Count,
 };
@@ -66,7 +56,5 @@ struct instruction_table
 {
     instruction_encoding *Encodings;
     u32 EncodingCount;
+    u32 MaxInstructionByteCount;
 };
-
-static instruction_table Get8086InstructionTable();
-static char const *GetMnemonic(operation_type Op);
