@@ -34,7 +34,7 @@ If you would like to do some of the homework using this decoder as a DLL, you ca
 
 * [sim86_shared.h](./shared/sim86_shared.h): C interface provided natively by this build
 * [contrib_python](./shared/contrib_python): Python wrapper provided by [Mārtiņš Možeiko](https://github.com/mmozeiko)
-* [contrib_csharp](./shared/contrib_csharp): CSharp wrapper provided by [Mārtiņš Možeiko](https://github.com/mmozeiko)
+* [contrib_csharp](./shared/contrib_csharp): C# wrapper provided by [Mārtiņš Možeiko](https://github.com/mmozeiko)
 * [contrib_odin](./shared/contrib_odin): Odin wrapper provided by [Samnuel Deboni](https://github.com/SamuelDeboni)
 
 \- Casey
