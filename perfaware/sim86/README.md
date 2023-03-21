@@ -32,7 +32,7 @@ Assuming everything is working properly, it will print a disassembly of the mach
 
 If you would like to do some of the homework using this decoder as a DLL, you can do so using the .lib and .dll in the [shared](./shared) folder. You will need to use the proper bindings for your language:
 
-* [sim86_shared.h](./shared/sim86_shared.h): C interface provided natively by this build
+* [sim86_shared.h](./shared/sim86_shared.h): C interface provided natively by this build, with [a usage example](./shared/shared_library_test.cpp).
 * [contrib_python](./shared/contrib_python): Python wrapper provided by [Mārtiņš Možeiko](https://github.com/mmozeiko)
 * [contrib_csharp](./shared/contrib_csharp): C# wrapper provided by [Mārtiņš Možeiko](https://github.com/mmozeiko)
 * [contrib_odin](./shared/contrib_odin): Odin wrapper provided by [Samnuel Deboni](https://github.com/SamuelDeboni)
