@@ -1,0 +1,15 @@
+{
+  "name": "sim8086_addon",
+  "version": "0.0.0",
+  "description": "Node.js wrapper for the Computer Enhanced sim8086 shared library",
+  "main": "sim8086_example.js",
+  "private": true,
+  "dependencies": {
+    "bindings": "~1.2.1",
+    "node-addon-api": "^1.0.0"
+  },
+  "scripts": {
+    "test": "node sim8086_example.js"
+  },
+  "gypfile": true
+}
