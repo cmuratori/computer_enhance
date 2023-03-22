@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>sim8086</title>
+    <script src="./lib.js" async></script>
+    <style>
+* 
+{
+	font-family: sans-serif;
+}
+
+#display 
+	{
+	display: flex;
+}
+
+#display #input
+	{
+	width: 40vw;
+}
+
+#display #output 
+	{
+	width: 50vw;
+}
+    </style>
+  </head>
+  <body>
+    <h2 id="version">Sim8086</h2>
+    <input id="choose" type="file">
+    <h3>Disassembly</h3>
+    <div id="display">
+      <div id="input"></div>
+      <div id="output"></div>
+    </div>
+    <script type="module">
+      import { main } from "./main.js"
+      main();
+      window.onload = function() {
+        loadLibrary().then(clib => window.clib = clib);
+      }
+    </script>
+  </body>
+</html>
