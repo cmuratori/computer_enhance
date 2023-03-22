@@ -25,7 +25,7 @@
 //   able to assemble the output when using the "-v" argument
 //
 //
-// For further information see on the original C++ implementation see:
+// For further information on the original C++ implementation see:
 //
 //   https://github.com/cmuratori/computer_enhance/blob/main/perfaware/sim86/sim86_text.cpp
 // 
