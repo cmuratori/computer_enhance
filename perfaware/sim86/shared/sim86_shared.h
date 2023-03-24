@@ -263,15 +263,13 @@ typedef struct instruction_table
 } instruction_table;
 
 #ifdef __cplusplus
-extern "C" u32 Sim86_GetVersion(void);
-extern "C" void Sim86_Decode8086Instruction(u32 SourceSize, u8 *Source, instruction *Dest);
-extern "C" char const *Sim86_RegisterNameFromOperand(register_access *RegAccess);
-extern "C" char const *Sim86_MnemonicFromOperationType(operation_type Type);
-extern "C" void Sim86_Get8086InstructionTable(instruction_table *Dest);
-#else
+extern "C" {
+#endif
 u32 Sim86_GetVersion(void);
 void Sim86_Decode8086Instruction(u32 SourceSize, u8 *Source, instruction *Dest);
 char const *Sim86_RegisterNameFromOperand(register_access *RegAccess);
 char const *Sim86_MnemonicFromOperationType(operation_type Type);
 void Sim86_Get8086InstructionTable(instruction_table *Dest);
+#ifdef __cplusplus
+}
 #endif
