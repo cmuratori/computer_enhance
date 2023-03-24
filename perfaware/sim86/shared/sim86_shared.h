@@ -11,7 +11,7 @@ typedef long long s64;
 typedef s32 b32;
 
 static u32 const SIM86_VERSION = 3;
-enum operation_type : u32
+typedef enum operation_type : u32
 {
     Op_None,
 
@@ -139,60 +139,60 @@ enum operation_type : u32
     Op_segment,
 
     Op_Count,
-};
+} operation_type;
 
-enum instruction_flag : u32
+typedef enum instruction_flag : u32
 {
     Inst_Lock = 0x1,
     Inst_Rep = 0x2,
     Inst_Segment = 0x4,
     Inst_Wide = 0x8,
     Inst_Far = 0x10,
-};
+} instruction_flag;
 
-struct register_access
+typedef struct register_access
 {
     u32 Index;
     u32 Offset;
     u32 Count;
-};
+} register_access;
 
-struct effective_address_term
+typedef struct effective_address_term
 {
     register_access Register;
     s32 Scale;
-};
+} effective_address_term;
 
-enum effective_address_flag : u32
+typedef enum effective_address_flag : u32
 {
     Address_ExplicitSegment = 0x1,
-};
-struct effective_address_expression
+} effective_address_flag;
+typedef struct effective_address_expression
 {
     effective_address_term Terms[2];
     u32 ExplicitSegment;
     s32 Displacement;
     u32 Flags;
-};
+} effective_address_expression;
 
-enum immediate_flag : u32
+typedef enum immediate_flag : u32
 {
     Immediate_RelativeJumpDisplacement = 0x1,
-};
-struct immediate
+} immediate_flag;
+typedef struct immediate
 {
     s32 Value;
     u32 Flags;
-};
+} immediate;
 
-enum operand_type : u32
+typedef enum operand_type : u32
 {
     Operand_None,
     Operand_Register,
     Operand_Memory,
     Operand_Immediate,
-};
-struct instruction_operand
+} operand_type;
+typedef struct instruction_operand
 {
     operand_type Type;
     union {
@@ -200,9 +200,9 @@ struct instruction_operand
         register_access Register;
         immediate Immediate;
     };
-};
+} instruction_operand;
 
-struct instruction
+typedef struct instruction
 {
     u32 Address;
     u32 Size;
@@ -213,8 +213,8 @@ struct instruction
     instruction_operand Operands[2];
 
     u32 SegmentOverride;
-};
-enum instruction_bits_usage : u8
+} instruction;
+typedef enum instruction_bits_usage : u8
 {
     Bits_End,
 
@@ -239,31 +239,39 @@ enum instruction_bits_usage : u8
     Bits_Far,
 
     Bits_Count,
-};
+} instruction_bits_usage;
 
-struct instruction_bits
+typedef struct instruction_bits
 {
     instruction_bits_usage Usage;
     u8 BitCount;
     u8 Shift;
     u8 Value;
-};
+} instruction_bits;
 
-struct instruction_encoding
+typedef struct instruction_encoding
 {
     operation_type Op;
     instruction_bits Bits[16];
-};
+} instruction_encoding;
 
-struct instruction_table
+typedef struct instruction_table
 {
     instruction_encoding *Encodings;
     u32 EncodingCount;
     u32 MaxInstructionByteCount;
-};
+} instruction_table;
 
+#ifdef __cplusplus
 extern "C" u32 Sim86_GetVersion(void);
 extern "C" void Sim86_Decode8086Instruction(u32 SourceSize, u8 *Source, instruction *Dest);
 extern "C" char const *Sim86_RegisterNameFromOperand(register_access *RegAccess);
 extern "C" char const *Sim86_MnemonicFromOperationType(operation_type Type);
 extern "C" void Sim86_Get8086InstructionTable(instruction_table *Dest);
+#else
+u32 Sim86_GetVersion(void);
+void Sim86_Decode8086Instruction(u32 SourceSize, u8 *Source, instruction *Dest);
+char const *Sim86_RegisterNameFromOperand(register_access *RegAccess);
+char const *Sim86_MnemonicFromOperationType(operation_type Type);
+void Sim86_Get8086InstructionTable(instruction_table *Dest);
+#endif
