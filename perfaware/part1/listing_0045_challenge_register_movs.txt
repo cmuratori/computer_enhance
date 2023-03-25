@@ -1,0 +1,35 @@
+--- test\listing_0045_challenge_register_movs execution ---
+mov ax, 8738 ; ax:0x0->0x2222 
+mov bx, 17476 ; bx:0x0->0x4444 
+mov cx, 26214 ; cx:0x0->0x6666 
+mov dx, 34952 ; dx:0x0->0x8888 
+mov ss, ax ; ss:0x0->0x2222 
+mov ds, bx ; ds:0x0->0x4444 
+mov es, cx ; es:0x0->0x6666 
+mov al, 17 ; ax:0x2222->0x2211 
+mov bh, 51 ; bx:0x4444->0x3344 
+mov cl, 85 ; cx:0x6666->0x6655 
+mov dh, 119 ; dx:0x8888->0x7788 
+mov ah, bl ; ax:0x2211->0x4411 
+mov cl, dh ; cx:0x6655->0x6677 
+mov ss, ax ; ss:0x2222->0x4411 
+mov ds, bx ; ds:0x4444->0x3344 
+mov es, cx ; es:0x6666->0x6677 
+mov sp, ss ; sp:0x0->0x4411 
+mov bp, ds ; bp:0x0->0x3344 
+mov si, es ; si:0x0->0x6677 
+mov di, dx ; di:0x0->0x7788 
+
+Final registers:
+      ax: 0x4411 (17425)
+      bx: 0x3344 (13124)
+      cx: 0x6677 (26231)
+      dx: 0x7788 (30600)
+      sp: 0x4411 (17425)
+      bp: 0x3344 (13124)
+      si: 0x6677 (26231)
+      di: 0x7788 (30600)
+      es: 0x6677 (26231)
+      ss: 0x4411 (17425)
+      ds: 0x3344 (13124)
+
