@@ -16,19 +16,19 @@
 
 bits 16
 
-mov ax, 2222h
-mov bx, 4444h
-mov cx, 6666h
-mov dx, 8888h
+mov ax, 0x2222
+mov bx, 0x4444
+mov cx, 0x6666
+mov dx, 0x8888
 
 mov ss, ax
 mov ds, bx
 mov es, cx
 
-mov al, 11h
-mov bh, 33h
-mov cl, 55h
-mov dh, 77h
+mov al, 0x11
+mov bh, 0x33
+mov cl, 0x55
+mov dh, 0x77
 
 mov ah, bl
 mov cl, dh
