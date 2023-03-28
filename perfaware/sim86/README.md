@@ -38,5 +38,6 @@ If you would like to do some of the homework using this decoder as a DLL, you ca
 * [contrib_odin](./shared/contrib_odin): Odin wrapper provided by [Samnuel Deboni](https://github.com/SamuelDeboni)
 * [contrib_go](./shared/contrib_go): GoLang wrapped provided by [akmubi](https://github.com/akmubi)
 * [contrib_json](./shared/contrib_nodejs): node.js wrapper provided by [Jeremy English](https://github.com/jeng)
+* [contrib_zig](./shared/contrib_zig): Zig wrapper provided by [Jorge Henriquez](https://github.com/penguingovernor)
 
 \- Casey
