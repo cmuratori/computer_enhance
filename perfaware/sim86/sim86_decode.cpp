@@ -315,6 +315,29 @@ static instruction DecodeInstruction(instruction_table Table, segmented_access A
     {
         Result = {};
     }
-    
+
+    if (Result.Op) {
+        if (Result.Op == Op_mov) {
+                printf("[PHT] Decoded Mov instruction with operand0 type %d\n", Result.Operands[0].Type);
+                if (Result.Operands[0].Type == Operand_Register) {
+                    printf("[PHT] Operand 0 - Register access index: %d, offset: %d, count: %d\n",
+                           Result.Operands[0].Register.Index,
+                           Result.Operands[0].Register.Offset,
+                           Result.Operands[0].Register.Count);
+                }
+
+
+                printf("[PHT] Decoded Mov instruction with operand1 type %d\n", Result.Operands[1].Type);
+                if (Result.Operands[1].Type == Operand_Register) {
+                    printf("[PHT] Operand 1 - Register access index: %d, offset: %d, count: %d\n",
+                           Result.Operands[1].Register.Index,
+                           Result.Operands[1].Register.Offset,
+                           Result.Operands[1].Register.Count);
+                }
+
+            }
+
+    }
+
     return Result;
 }
