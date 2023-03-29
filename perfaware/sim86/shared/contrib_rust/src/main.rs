@@ -1,4 +1,5 @@
 use sim86_shared::*;
+use std::env;
 
 const EXAMPLE_DISASSEMBLY: [u8; 247] = [
     0x03, 0x18, 0x03, 0x5E, 0x00, 0x83, 0xC6, 0x02, 0x83, 0xC5, 0x02, 0x83, 0xC1, 0x08, 0x03, 0x5E,
@@ -32,9 +33,26 @@ fn main() {
         table.EncodingCount
     );
 
+    // Note(rob): If the user passes in a file, then we can use that to get the
+    // disassembly, otherwise we use the EXAMPLE_DISASSEMBLY.
+
+    let args: Vec<String> = env::args().collect();
+
+    let file_buf = if args.len() > 1 {
+        let file_path = &args[1];
+        Some(
+            std::fs::read(file_path)
+                .unwrap_or_else(|_| panic!("Failed to read the file {}", file_path)),
+        )
+    } else {
+        None
+    };
+
+    let buf = file_buf.unwrap_or_else(|| EXAMPLE_DISASSEMBLY.to_vec());
+
     let mut offset = 0u32;
-    while offset < EXAMPLE_DISASSEMBLY.len() as u32 {
-        let decoded = decode_8086_instruction(&EXAMPLE_DISASSEMBLY[offset as usize..]);
+    while offset < buf.len() as u32 {
+        let decoded = decode_8086_instruction(&buf[offset as usize..]);
         if let Some(decoded) = decoded {
             if decoded.Op != operation_type_Op_None {
                 offset += decoded.Size;
