@@ -2,7 +2,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use ::std::mem::MaybeUninit;
+use std::mem::MaybeUninit;
 use std::{borrow::Cow, ffi::CStr};
 
 include!(concat!(env!("OUT_DIR"), "/sim86_shared.rs"));
