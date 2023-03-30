@@ -1,0 +1,3 @@
+target/
+sim86_shared_debug.dll
+sim86_shared_release.dll

@@ -1,0 +1,17 @@
+[package]
+name = "contrib_rust"
+version = "0.1.0"
+edition = "2021"
+
+[build-dependencies]
+cc = "1.0.79"
+bindgen = "0.64.0"
+
+[lib]
+name = "sim86_shared"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sim86_shared_example"
+path = "src/main.rs"
+
