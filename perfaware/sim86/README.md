@@ -39,6 +39,6 @@ If you would like to do some of the homework using this decoder as a DLL, you ca
 * [contrib_go](./shared/contrib_go): GoLang wrapped provided by [akmubi](https://github.com/akmubi)
 * [contrib_json](./shared/contrib_nodejs): node.js wrapper provided by [Jeremy English](https://github.com/jeng)
 * [contrib_zig](./shared/contrib_zig): Zig wrapper provided by [Jorge Henriquez](https://github.com/penguingovernor)
-* [contrib_rust](/shared/contrib_rust): Rust wrapper provided by [Robert Vally](https://github.com/shiver)
+* [contrib_rust](./shared/contrib_rust): Rust wrapper provided by [Robert Vally](https://github.com/shiver)
 
 \- Casey
