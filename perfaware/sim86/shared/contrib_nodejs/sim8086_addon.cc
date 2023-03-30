@@ -52,7 +52,7 @@
 //
 // 1. Build the shared library:
 //
-//   a. cd to `$SRC/computer_enhance/perfaware/sim86/shared`
+//   a. cd to `$SRC/computer_enhance/perfaware/sim86`
 //
 //   b. clang++ -c -fPIC -o sim86_shared.o sim86_lib.cpp
 //
