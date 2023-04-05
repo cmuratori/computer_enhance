@@ -12,6 +12,9 @@ fn main() {
     // Compile the library ourselves so we don't need to rely on the existing platform specific binaries
     cc::Build::new()
         .file(lib_path.join("../sim86_lib.cpp"))
+        .flag("-std=c++17")
+        .flag("-Wno-missing-field-initializers")
+        .flag("-Wno-unused-function")
         .compile("sim86_shared");
 
     let bindings = bindgen::Builder::default()
