@@ -1,0 +1,5 @@
+Makefile
+*.def
+*.o
+*.so
+generated*
