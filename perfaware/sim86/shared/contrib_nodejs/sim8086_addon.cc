@@ -10,6 +10,10 @@
 // "javascript-ty".  If you are a javascript guru please make improvements.
 //
 //
+//-----------------------------------------------------------------------------
+//
+// BUILDING ON WINDOWS
+//
 // To build this you will need a couple of things (this only works on windows)
 //
 // 1. Download the sim86_shared.dll and sim86_shared.h files
@@ -27,7 +31,6 @@
 //    - binding.gyp
 //    - sim86_shared.dll
 //
-//
 // 3. Start a shell that has a C++ compiler available.
 //
 //    I do this by running vcvarsall.bat.  This has been test with "Microsoft
@@ -43,6 +46,39 @@
 //
 // 7. For the full disassembler see sim8086_disassemble.js
 //
+//-----------------------------------------------------------------------------
+//
+// BUILDING ON LINUX
+//
+// 1. Build the shared library:
+//
+//   a. cd to `$SRC/computer_enhance/perfaware/sim86`
+//
+//   b. clang++ -c -fPIC -o sim86_shared.o sim86_lib.cpp
+//
+//   c. clang++ -shared sim86_shared.o -o libsim86.so
+//
+// 2. Copy the library to /usr/local/lib (gyp will look in that folder)
+//
+//   a. sudo cp libsim86.so /usr/local/lib/libsim86.so
+//
+// 3. cd shared/contrib_nodejs
+//
+// 4. copy sim86_shared.h to current folder
+//
+//   a. cp ../sim86_shared.h .
+//
+// 5. Run npm install (I make sure that it is using clang)
+//
+//   a. env V=1 CC=clang CXX=clang++ npm install
+//
+// 6. node ./
+//
+// 7. Test the disassembler
+//
+//   a. node ./sim8086_disassemble.js ../../../part1/listing_0042_completionist_decode
+//
+//-----------------------------------------------------------------------------
 //
 // For more information see:
 //
@@ -51,7 +87,11 @@
 
 
 #include <napi.h>
+
+#if defined(_WIN32)
 #include <windows.h>
+#endif
+
 #include <stdio.h>
 #include "sim86_shared.h"
 
@@ -73,7 +113,10 @@ internal sim86_get8086instructiontable_t Dll_Sim86_Get8086InstructionTable;
 
 
 internal void 
-Win32LoadSim86(Napi::Env env) {
+LoadSim86(Napi::Env env) {
+
+#if defined(_WIN32)
+
   HMODULE sim86Library = LoadLibrary("sim86_shared.dll");
   if(sim86Library) {
 
@@ -95,6 +138,16 @@ Win32LoadSim86(Napi::Env env) {
   } else {
     Napi::TypeError::New(env, "Could not load sim86_shared.dll").ThrowAsJavaScriptException();
   }
+
+#else
+
+    Dll_Sim86_GetVersion = Sim86_GetVersion;
+    Dll_Sim86_Decode8086Instruction = Sim86_Decode8086Instruction;
+    Dll_Sim86_RegisterNameFromOperand = Sim86_RegisterNameFromOperand;
+    Dll_Sim86_MnemonicFromOperationType = Sim86_MnemonicFromOperationType;
+    Dll_Sim86_Get8086InstructionTable = Sim86_Get8086InstructionTable;
+
+#endif
 }
 
 
@@ -330,7 +383,7 @@ Napi::Object Sim86Decode8086Instruction(const Napi::CallbackInfo& info) {
 
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  Win32LoadSim86(env);
+  LoadSim86(env);
   //TODO Where is the destructor?
   //else { FreeLibrary((HMODULE)h);
 
