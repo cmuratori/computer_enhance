@@ -58,6 +58,7 @@ static char const *GetRegName(register_access Reg)
 static void PrintEffectiveAddressExpression(effective_address_expression Address, FILE *Dest)
 {
     char const *Separator = "";
+    bool HasTerms = false;
     for(u32 Index = 0; Index < ArrayCount(Address.Terms); ++Index)
     {
         effective_address_term Term = Address.Terms[Index];
@@ -65,6 +66,7 @@ static void PrintEffectiveAddressExpression(effective_address_expression Address
         
         if(Reg.Index)
         {
+            HasTerms = true;
             fprintf(Dest, "%s", Separator);
             if(Term.Scale != 1)
             {
@@ -75,7 +77,7 @@ static void PrintEffectiveAddressExpression(effective_address_expression Address
         }
     }
     
-    if(Address.Displacement != 0)
+    if(Address.Displacement != 0 || !HasTerms)
     {
         fprintf(Dest, "%+d", Address.Displacement);
     }
