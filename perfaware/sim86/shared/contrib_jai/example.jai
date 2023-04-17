@@ -1,9 +1,6 @@
-#import "sim86"(DEBUG = true);
+// 1:1 port of shared_library_test.cpp, with minimal jai-ifications
 
-#import "Basic";
-
-main :: () {
-    ExampleDisassembly : [247] u8 = .[
+ExampleDisassembly :: u8.[
     0x03, 0x18, 0x03, 0x5E, 0x00, 0x83, 0xC6, 0x02, 0x83, 0xC5, 0x02, 0x83, 0xC1, 0x08, 0x03, 0x5E,
     0x00, 0x03, 0x4F, 0x02, 0x02, 0x7A, 0x04, 0x03, 0x7B, 0x06, 0x01, 0x18, 0x01, 0x5E, 0x00, 0x01,
     0x5E, 0x00, 0x01, 0x4F, 0x02, 0x00, 0x7A, 0x04, 0x01, 0x7B, 0x06, 0x80, 0x07, 0x22, 0x83, 0x82,
@@ -19,39 +16,35 @@ main :: () {
     0x3D, 0xE8, 0x03, 0x3C, 0xE2, 0x3C, 0x09, 0x75, 0x02, 0x75, 0xFC, 0x75, 0xFA, 0x75, 0xFC, 0x74,
     0xFE, 0x7C, 0xFC, 0x7E, 0xFA, 0x72, 0xF8, 0x76, 0xF6, 0x7A, 0xF4, 0x70, 0xF2, 0x78, 0xF0, 0x75,
     0xEE, 0x7D, 0xEC, 0x7F, 0xEA, 0x73, 0xE8, 0x77, 0xE6, 0x7B, 0xE4, 0x71, 0xE2, 0x79, 0xE0, 0xE2,
-    0xDE, 0xE1, 0xDC, 0xE0, 0xDA, 0xE3, 0xD8 ];
+    0xDE, 0xE1, 0xDC, 0xE0, 0xDA, 0xE3, 0xD8
+];
 
-    print("ExampleDisassembly.count: %\n\n", ExampleDisassembly.count);
-    Version : u32 = Sim86_GetVersion();
-    print("Sim86 Version: % (expected %)\n", Version, SIM86_VERSION);
-    if(Version != SIM86_VERSION) {
-        print("ERROR: Header file version doesn't match DLL.\n");
+
+main :: () {
+    version := Sim86_GetVersion();
+    log("Sim86 Version: % (expected %)", version, SIM86_VERSION);
+    if version != SIM86_VERSION {
+        log_error("ERROR: Header file version doesn't match DLL.");
         exit(-1);
     }
-
-    Table: instruction_table;
-    Sim86_Get8086InstructionTable(*Table);
-    print("8086 Instruction Instruction Encoding Count: %\n", Table.EncodingCount);
-
-    Offset : u32;
-    while(Offset < ExampleDisassembly.count) {
-    {
-        print("ERROR: Header file version doesn't match DLL.\n");
-        exit(-1);
-    }    Decoded: instruction;
-   {
-        print("ERROR: Header file version doesn't match DLL.\n");
-        exit(-1);
-    }     Sim86_Decode8086Instruction(ExampleDisassembly.count - Offset, *ExampleDisassembly[Offset], *Decoded);
-        if Decoded.Op {
-            Offset += Decoded.Size;
-            print("Size:% Op:% Flags:0x%\n", Decoded.Size, to_string(Sim86_MnemonicFromOperationType(Decoded.Op)), formatInt(Decoded.Flags, base=16));
-        }
-        else
-        {
-            print("Unrecognized instruction\n");
-            break;
+    
+    table: instruction_table;
+    Sim86_Get8086InstructionTable(*table);
+    log("8086 Instruction Instruction Encoding Count: %", table.EncodingCount);
+    
+    offset: u32;
+    while offset < ExampleDisassembly.count {
+        decoded: instruction;
+        Sim86_Decode8086Instruction(ExampleDisassembly.count - offset, ExampleDisassembly.data + offset, *decoded);
+        if decoded.Op {
+            offset += decoded.Size;
+            log("Size:% Op:% Flags:%", decoded.Size, to_string(Sim86_MnemonicFromOperationType(decoded.Op)), decoded.Flags);
+        } else {
+            log_error("Unrecognized instruction");
+            exit(-1);
         }
     }
 }
 
+#import "Basic";
+#import,file "module.jai";
