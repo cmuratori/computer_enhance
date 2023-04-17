@@ -40,7 +40,7 @@ If you would like to do some of the homework using this decoder as a DLL, you ca
 * [contrib_json](./shared/contrib_nodejs): node.js wrapper provided by [Jeremy English](https://github.com/jeng)
 * [contrib_zig](./shared/contrib_zig): Zig wrapper provided by [Jorge Henriquez](https://github.com/penguingovernor)
 * [contrib_rust](./shared/contrib_rust): Rust wrapper provided by [Robert Vally](https://github.com/shiver)
-* [contrib_jai](./shared/contrib_jai): JAI wrapper provided by [Tomasz Różański](https://github.com/tomasz-rozanski)
+* [contrib_jai](./shared/contrib_jai): JAI wrapper provided by [Tomasz Różański](https://github.com/tomasz-rozanski) and [Raphael Luba](https://github.com/rluba)
 * [contrib_ruby](./shared/contrib_ruby): Ruby wrapper provided by [David Grayson](https://github.com/DavidEGrayson)
 
 \- Casey
