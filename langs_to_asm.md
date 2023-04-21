@@ -36,7 +36,7 @@ To see source code along with reasonable ASM when using a debugger, you must ens
 
 Once you have an executable that has debug information _and_ optimizations enabled, you can load the executable into a debugger and step through the ASM using the instructions below:
 
-**Using Visual Studio**:
+## Using Visual Studio:
 
 * If you did not build the executable inside Visual Studio to begin with, you can open an executable directly by selecting `Open -> Project/Solution...` from the `File` menu, then picking `Exe Project Files (*.exe)` from the file type drop-down. This will allow you to open any executable for debugging.
 * Press `F11` or select `Step Into` from the `Debug` menu to begin debugging the program.
