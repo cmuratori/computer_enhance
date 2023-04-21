@@ -6,9 +6,9 @@ In Part 2, we learn to analyze compiler output and assess the performance of ins
 
 Hopefully this will provide a growing quick-reference for people learning to read ASM to better understand the performance of their programs.
 
-# Using Godbolt
+# Using Compiler Explorer
 
-If it supports machine code output for your language, Godbolt is often the simplest way to get a quick glance at the ASM for small programs. You cannot "step through" the ASM to see what it's doing like you can in a debugger, but it lets you see multiple compilations of the same program at once, which can be very useful.
+If it supports machine code output for your language, Compiler Explorer is often the simplest way to get a quick glance at the ASM for small programs. You cannot "step through" the ASM to see what it's doing like you can in a debugger, but it lets you see multiple compilations of the same program at once, which can be very useful.
 
 * Go to [godbolt.org](godbolt.org).
 * Select your language from the language drop-down.
@@ -22,7 +22,7 @@ If it supports machine code output for your language, Godbolt is often the simpl
 | C / C++   | CLANG     | -O3 |
 | C#        | .NET      | |
 
-Note that not all languages supported by Godbolt provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which godbolt can produce real ASM.
+Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
 # Using a debugger
 
