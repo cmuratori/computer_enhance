@@ -56,6 +56,35 @@ Several command line utilities are available
 dumpbin /disasm test.exe > test_disassembly.asm
 ```
 
+### otool
+
+otool is a command-line utility which examines Mach-O files for macOS.
+
+* Install Xcode or the Xcode Command Line Tools if you do not already have otool installed.
+* To disassemble an executable (in this case, "test") to an ASM listing file, use:
+```
+otool -tV test > test_disassembly.asm
+```
+To demangle C++ symbols, also use c++filt (which is also installed with Xcode):
+```
+otool -tV test | c++filt > test_disassembly.asm
+```
+
+### objdump
+
+objdump is a command-line utility which examines many different executable
+files, including ELF for Linux.
+
+There are two tools called objdump: the original objdump from GNU binutils and
+LLVM's objdump. This section describes the objdump from GNU binutils, but these
+instructions may work for LLVM's objdump too.
+
+* Install GNU binutils if you do not already have objdump installed.
+* To disassemble an executable (in this case, "test") to an ASM listing file, use:
+```
+objdump -d --demangle test > test_disassembly.asm
+```
+
 # If you'd like to contribute a new language or method...
 
 ... please submit a pull request! Note that in order to be included here, you must provide comprehensive instructions that allow someone to either step through or conveniently view the assembly language output of a program snippet.
