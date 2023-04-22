@@ -43,6 +43,39 @@ Once you have an executable that has debug information _and_ optimizations enabl
 * If you are viewing source code only, right-click in the source code window and select `Go To Disassembly` from the context menu.
 * To step through system or library ASM without Visual Studio warning you, make sure `Enable address-level debugging` and `Show disassembly if source is not available` are both checked from the `Options` dialog under the `Debug` menu (`Debugging -> General`).
 
+### LLDB
+
+If your binary has debugging symbols (see above), you can disassemble whole 
+functions or stack frames.
+
+* Start `lldb` and read the binary: `lldb -- <binary>` (e.g. `lldb -- test`)
+* Switch to Intel disassembly flavor: `settings set target.x86-disassembly-flavor intel` (See the note below if you wonder what this means!).
+* To disassemble a specific function, e.g. `main`: `disassemble -b -n main`
+* Set a breakpoint and run to it, e.g. `b main` then `run`
+* To disassemble the current function for the current stack frame: `disassemble -b`
+* To display disassembly on every step/stepi: `settings set stop-disassembly-display always`
+* To step by instruction use `stepi`, `nexti` (as apposed to `step`, `next`)
+
+There are more options to the disassembler you may wish to use (see `help disassemble`), but the most interesting ones ones are:
+
+* `-F intel` (also set by `target.x86-disassembly-flavor`) - use intel dialect.  This is not explicitly discussed in the course so far, but by default LLDB will use an ASM dialect known as AT&T style. For the purposes of this course, it's recommended to always specify `-F intel`. If you get a message about `Disassembler flavors are currently only supported for x86 and x86_64 targets`, you might be on an Apple Silicon Mac; see the note below.
+* `-b` - show the instruction bytes. This shows the actual bytes as hex as well as the disassembly.
+* `-n <name>` - disassemble function named `<name>`
+
+***Note for Apple Silicon:*** If you are on an Apple Silicon Mac and following
+this course, you might be confused by the disassembly output not matching the
+x86_64 instructions. That's because Apple Silicon is an ARM procesor. SImply
+pass `-arch x86_64` to the `clang` compiler to produce an Intel/x86_64 binary
+and use the above instructions unchanged.
+
+To avoid having to type `settings set ...` every time, you can put these
+commands into a `.lldbinit` file in your home directory:
+
+```
+settings set target.x86-disassembly-flavor intel
+settings set stop-disassembly-display always
+```
+
 # Dumping an executable to ASM
 
 Several command line utilities are available 
