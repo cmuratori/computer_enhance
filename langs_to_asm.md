@@ -23,7 +23,6 @@ If it supports machine code output for your language, Compiler Explorer is often
 | C#        | .NET      | |
 | ZIG       | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
 
-
 Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
 # Using a debugger
