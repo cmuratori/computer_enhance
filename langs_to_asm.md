@@ -21,6 +21,8 @@ If it supports machine code output for your language, Compiler Explorer is often
 | C / C++   | GCC       | -O3 |
 | C / C++   | CLANG     | -O3 |
 | C#        | .NET      | |
+| ZIG       | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
+
 
 Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
@@ -33,6 +35,7 @@ To see source code along with reasonable ASM when using a debugger, you must ens
 | C / C++   | MSVC      | -Zi -O2 |
 | C / C++   | GCC       | -g -O3 |
 | C / C++   | CLANG     | -g -O3 |
+| ZIG       | ZIG       | -femit-asm -OReleaseFast |
 
 Once you have an executable that has debug information _and_ optimizations enabled, you can load the executable into a debugger and step through the ASM using the instructions below:
 
