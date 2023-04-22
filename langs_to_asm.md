@@ -14,6 +14,7 @@ If it supports machine code output for your language, Compiler Explorer is often
 * Select your language from the language drop-down.
 * Select your compiler from the compiler drop-down. If you do not see a compiler drop-down (or if you'd like to add a second compiler), you can add a new compiler window by selecting `Add new... -> Compiler`
 * If you are unsure what compiler options you should put in the `Compiler Options` box, consult the following table for recommendations:
+* For Zig, you might need to type in "Zig" in the language text box to find it, as it is not in the drop menu.
 
 | Language  | Compiler  | Typical Compiler Options |
 | --------- | --------- | ------------------------ |
