@@ -14,7 +14,6 @@ If it supports machine code output for your language, Compiler Explorer is often
 * Select your language from the language drop-down.
 * Select your compiler from the compiler drop-down. If you do not see a compiler drop-down (or if you'd like to add a second compiler), you can add a new compiler window by selecting `Add new... -> Compiler`
 * If you are unsure what compiler options you should put in the `Compiler Options` box, consult the following table for recommendations:
-* For Zig, you might need to type in "Zig" in the language text box to find it, as it is not in the drop menu.
 
 | Language  | Compiler  | Typical Compiler Options |
 | --------- | --------- | ------------------------ |
@@ -22,7 +21,9 @@ If it supports machine code output for your language, Compiler Explorer is often
 | C / C++   | GCC       | -O3 |
 | C / C++   | CLANG     | -O3 |
 | C#        | .NET      | |
-| ZIG       | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
+| ZIG(1)    | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
+
+(1) For Zig, you might need to type in "Zig" in the language text box to find it, as some versions of Compiler Explorer have a bug where it does not show up in the drop-down menu.
 
 Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
