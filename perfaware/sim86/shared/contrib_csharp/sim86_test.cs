@@ -19,16 +19,17 @@ internal class Program
             Offset += Decoded.Size;
             if (Decoded.Op != Sim86.OperationType.None)
             {
-                if(Decoded.Op == Sim86.OperationType.mov)
+                if (Decoded.Op == Sim86.OperationType.mov)
                 {
-                    if(Decoded.Operands[0] is Sim86.RegisterAccess reg)
+                    if (Decoded.Operands[0] is Sim86.RegisterAccess reg)
                     {
                         var registerName = Sim86.RegisterNameFromOperand(reg);
-                        var registerSlot = (Register)Enum.Parse(typeof(Register), registerName);
-                        if(Decoded.Operands[1] is Sim86.Immediate imm)
+                        var registerId = (RegisterId)Enum.Parse(typeof(RegisterId), registerName);
+                        if (Decoded.Operands[1] is Sim86.Immediate imm)
                         {
-                            Console.WriteLine($"{Decoded.Op} {registerName}, {imm.Value} ; {registerName}:{Registers[(int)registerSlot].ToString("X")}->{imm.Value.ToString("X")}");
-                            Registers[(int)registerSlot] = imm.Value;
+                            var register = Registers[(int)registerId];
+                            Console.WriteLine($"{Decoded.Op} {registerName}, {imm.Value} ; {registerName}:0x{register.ToString("X")}->0x{imm.Value.ToString("X")}");
+                            Registers[(int)registerId] = imm.Value;
                         }
                     }
                 }
@@ -41,14 +42,14 @@ internal class Program
             }
         }
 
-        for(var i = 0; i < Registers.Length; i++)
+        for (var i = 0; i < Registers.Length; i++)
         {
-            Console.WriteLine($"{(Register)i}: {Registers[i]}");
+            Console.WriteLine($"{(RegisterId)i}: {Registers[i]}");
         }
     }
 }
 
-enum Register
+enum RegisterId
 {
     ax,
     bx,
