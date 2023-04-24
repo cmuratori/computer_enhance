@@ -37,7 +37,7 @@ xor     ax, ax
 	add     al, byte [bp + 1]
 	add     al, byte [bp + 2]
 	add     al, byte [bp + 3]
-	add     bp, 16
+	add     bp, 4
 	dec     di
 	jne     .LBB6_2
 		
