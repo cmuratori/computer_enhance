@@ -274,9 +274,9 @@ test "decode8086Instruction/mnemonicFromOperationType" {
 
     var decoded = try sim86.decode8086Instruction(mem);
     try std.testing.expectEqual(@intCast(u32, 2), decoded.Size);
-    try std.testing.expectEqual(@intCast(u32, 0x8), decoded.Flags);
+    try std.testing.expectEqual(sim86.InstructionFlag{ .Wide = true }, decoded.Flags);
     try std.testing.expectEqualStrings("add", sim86.mnemonicFromOperationType(decoded.Op));
-    try std.testing.expectEqual(sim86.OperandType.OperandRegister, @intToEnum(sim86.OperandType, decoded.Operands[0].Type));
-    try std.testing.expectEqualStrings("bx", sim86.registerNameFromOperand(&(decoded.Operands[0].unnamed_0.Register)));
-    try std.testing.expectEqual(sim86.OperandType.OperandMemory, @intToEnum(sim86.OperandType, decoded.Operands[1].Type));
+    try std.testing.expectEqual(sim86.OperandType.OperandRegister, decoded.Operands[0].Type);
+    try std.testing.expectEqualStrings("bx", sim86.registerNameFromOperand(&(decoded.Operands[0].data.Register)));
+    try std.testing.expectEqual(sim86.OperandType.OperandMemory, decoded.Operands[1].Type);
 }
