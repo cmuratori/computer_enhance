@@ -176,7 +176,7 @@ pub const OperandType = enum(u32) {
     OperandImmediate,
 };
 
-const InstructionOperand = extern struct {
+pub const InstructionOperand = extern struct {
     Type: OperandType,
     data: Data, // <- no anon unions in zig
     const Data = extern union {
