@@ -21,9 +21,7 @@ If it supports machine code output for your language, Compiler Explorer is often
 | C / C++   | GCC       | -O3 |
 | C / C++   | CLANG     | -O3 |
 | C#        | .NET      | |
-| ZIG(1)    | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
-
-(1) For Zig, you might need to type in "Zig" in the language text box to find it, as some versions of Compiler Explorer have a bug where it does not show up in the drop-down menu.
+| ZIG       | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
 
 Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
