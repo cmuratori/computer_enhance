@@ -1,0 +1,44 @@
+
+WARNING: Clocks reported by this utility are strictly from the 8086 manual.
+They will be inaccurate, both because the manual clocks are estimates, and because
+some of the entries in the manual look highly suspicious and are probably typos.
+
+--- test\listing_0064_TreeScalarPtr execution ---
+mov di, 8 ; Clocks: +4 = 4 | di:0x0->0x8 ip:0x0->0x3 
+mov bp, 1000 ; Clocks: +4 = 8 | bp:0x0->0x3e8 ip:0x3->0x6 
+mov byte [bp], 9 ; Clocks: +15 = 23 (10 + 5ea) | ip:0x6->0xa 
+mov byte [bp+1], 17 ; Clocks: +19 = 42 (10 + 9ea) | ip:0xa->0xe 
+mov byte [bp+2], 23 ; Clocks: +19 = 61 (10 + 9ea) | ip:0xe->0x12 
+mov byte [bp+3], 4 ; Clocks: +19 = 80 (10 + 9ea) | ip:0x12->0x16 
+mov byte [bp+4], 27 ; Clocks: +19 = 99 (10 + 9ea) | ip:0x16->0x1a 
+mov byte [bp+5], 41 ; Clocks: +19 = 118 (10 + 9ea) | ip:0x1a->0x1e 
+mov byte [bp+6], 39 ; Clocks: +19 = 137 (10 + 9ea) | ip:0x1e->0x22 
+mov byte [bp+7], 31 ; Clocks: +19 = 156 (10 + 9ea) | ip:0x22->0x26 
+xor ax, ax ; Clocks: +3 = 159 | ip:0x26->0x28 flags:->PZ 
+cmp di, 4 ; Clocks: +4 = 163 | ip:0x28->0x2b flags:PZ-> 
+jb $+26 ; Clocks: +4 = 167 | ip:0x2b->0x2d 
+shr di, 1 ; Clocks: +2 = 169 | di:0x8->0x4 ip:0x2d->0x2f 
+shr di, 1 ; Clocks: +2 = 171 | di:0x4->0x2 ip:0x2f->0x31 
+xor ax, ax ; Clocks: +3 = 174 | ip:0x31->0x33 flags:->PZ 
+add al, [bp] ; Clocks: +14 = 188 (9 + 5ea) | ax:0x0->0x9 ip:0x33->0x36 flags:PZ->P 
+add al, [bp+1] ; Clocks: +18 = 206 (9 + 9ea) | ax:0x9->0x1a ip:0x36->0x39 flags:P-> 
+add al, [bp+2] ; Clocks: +18 = 224 (9 + 9ea) | ax:0x1a->0x31 ip:0x39->0x3c flags:->A 
+add al, [bp+3] ; Clocks: +18 = 242 (9 + 9ea) | ax:0x31->0x35 ip:0x3c->0x3f flags:A->P 
+add bp, 4 ; Clocks: +4 = 246 | bp:0x3e8->0x3ec ip:0x3f->0x42 flags:P-> 
+dec di ; Clocks: +2 = 248 | di:0x2->0x1 ip:0x42->0x43 
+jne $-16 ; Clocks: +16 = 264 | ip:0x43->0x33 
+add al, [bp] ; Clocks: +14 = 278 (9 + 5ea) | ax:0x35->0x50 ip:0x33->0x36 flags:->PA 
+add al, [bp+1] ; Clocks: +18 = 296 (9 + 9ea) | ax:0x50->0x79 ip:0x36->0x39 flags:PA-> 
+add al, [bp+2] ; Clocks: +18 = 314 (9 + 9ea) | ax:0x79->0xa0 ip:0x39->0x3c flags:->PASO 
+add al, [bp+3] ; Clocks: +18 = 332 (9 + 9ea) | ax:0xa0->0xbf ip:0x3c->0x3f flags:PASO->S 
+add bp, 4 ; Clocks: +4 = 336 | bp:0x3ec->0x3f0 ip:0x3f->0x42 flags:S->PA 
+dec di ; Clocks: +2 = 338 | di:0x1->0x0 ip:0x42->0x43 flags:PA->PZ 
+jne $-16 ; Clocks: +4 = 342 | ip:0x43->0x45 
+STOPONRET: Return encountered at address 69.
+
+Final registers:
+      ax: 0x00bf (191)
+      bp: 0x03f0 (1008)
+      ip: 0x0045 (69)
+   flags: PZ
+

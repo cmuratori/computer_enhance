@@ -1,0 +1,64 @@
+
+WARNING: Clocks reported by this utility are strictly from the 8086 manual.
+They will be inaccurate, both because the manual clocks are estimates, and because
+some of the entries in the manual look highly suspicious and are probably typos.
+
+--- test\listing_0059_SingleScalar execution ---
+mov di, 8 ; Clocks: +4 = 4 | di:0x0->0x8 ip:0x0->0x3 
+mov bp, 1000 ; Clocks: +4 = 8 | bp:0x0->0x3e8 ip:0x3->0x6 
+mov byte [bp], 9 ; Clocks: +15 = 23 (10 + 5ea) | ip:0x6->0xa 
+mov byte [bp+1], 17 ; Clocks: +19 = 42 (10 + 9ea) | ip:0xa->0xe 
+mov byte [bp+2], 23 ; Clocks: +19 = 61 (10 + 9ea) | ip:0xe->0x12 
+mov byte [bp+3], 4 ; Clocks: +19 = 80 (10 + 9ea) | ip:0x12->0x16 
+mov byte [bp+4], 27 ; Clocks: +19 = 99 (10 + 9ea) | ip:0x16->0x1a 
+mov byte [bp+5], 41 ; Clocks: +19 = 118 (10 + 9ea) | ip:0x1a->0x1e 
+mov byte [bp+6], 39 ; Clocks: +19 = 137 (10 + 9ea) | ip:0x1e->0x22 
+mov byte [bp+7], 31 ; Clocks: +19 = 156 (10 + 9ea) | ip:0x22->0x26 
+test di, di ; Clocks: +3 = 159 | ip:0x26->0x28 
+je $+16 ; Clocks: +4 = 163 | ip:0x28->0x2a 
+mov cx, di ; Clocks: +2 = 165 | cx:0x0->0x8 ip:0x2a->0x2c 
+xor si, si ; Clocks: +3 = 168 | ip:0x2c->0x2e flags:->PZ 
+xor ax, ax ; Clocks: +3 = 171 | ip:0x2e->0x30 
+add al, [bp+si] ; Clocks: +17 = 188 (9 + 8ea) | ax:0x0->0x9 ip:0x30->0x32 flags:PZ->P 
+inc si ; Clocks: +2 = 190 | si:0x0->0x1 ip:0x32->0x33 flags:P-> 
+cmp cx, si ; Clocks: +3 = 193 | ip:0x33->0x35 
+jne $-5 ; Clocks: +16 = 209 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 226 (9 + 8ea) | ax:0x9->0x1a ip:0x30->0x32 
+inc si ; Clocks: +2 = 228 | si:0x1->0x2 ip:0x32->0x33 
+cmp cx, si ; Clocks: +3 = 231 | ip:0x33->0x35 flags:->P 
+jne $-5 ; Clocks: +16 = 247 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 264 (9 + 8ea) | ax:0x1a->0x31 ip:0x30->0x32 flags:P->A 
+inc si ; Clocks: +2 = 266 | si:0x2->0x3 ip:0x32->0x33 flags:A->P 
+cmp cx, si ; Clocks: +3 = 269 | ip:0x33->0x35 
+jne $-5 ; Clocks: +16 = 285 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 302 (9 + 8ea) | ax:0x31->0x35 ip:0x30->0x32 
+inc si ; Clocks: +2 = 304 | si:0x3->0x4 ip:0x32->0x33 flags:P-> 
+cmp cx, si ; Clocks: +3 = 307 | ip:0x33->0x35 
+jne $-5 ; Clocks: +16 = 323 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 340 (9 + 8ea) | ax:0x35->0x50 ip:0x30->0x32 flags:->PA 
+inc si ; Clocks: +2 = 342 | si:0x4->0x5 ip:0x32->0x33 flags:PA->P 
+cmp cx, si ; Clocks: +3 = 345 | ip:0x33->0x35 
+jne $-5 ; Clocks: +16 = 361 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 378 (9 + 8ea) | ax:0x50->0x79 ip:0x30->0x32 flags:P-> 
+inc si ; Clocks: +2 = 380 | si:0x5->0x6 ip:0x32->0x33 flags:->P 
+cmp cx, si ; Clocks: +3 = 383 | ip:0x33->0x35 flags:P-> 
+jne $-5 ; Clocks: +16 = 399 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 416 (9 + 8ea) | ax:0x79->0xa0 ip:0x30->0x32 flags:->PASO 
+inc si ; Clocks: +2 = 418 | si:0x6->0x7 ip:0x32->0x33 flags:PASO-> 
+cmp cx, si ; Clocks: +3 = 421 | ip:0x33->0x35 
+jne $-5 ; Clocks: +16 = 437 | ip:0x35->0x30 
+add al, [bp+si] ; Clocks: +17 = 454 (9 + 8ea) | ax:0xa0->0xbf ip:0x30->0x32 flags:->S 
+inc si ; Clocks: +2 = 456 | si:0x7->0x8 ip:0x32->0x33 flags:S-> 
+cmp cx, si ; Clocks: +3 = 459 | ip:0x33->0x35 flags:->PZ 
+jne $-5 ; Clocks: +4 = 463 | ip:0x35->0x37 
+STOPONRET: Return encountered at address 55.
+
+Final registers:
+      ax: 0x00bf (191)
+      cx: 0x0008 (8)
+      bp: 0x03e8 (1000)
+      si: 0x0008 (8)
+      di: 0x0008 (8)
+      ip: 0x0037 (55)
+   flags: PZ
+

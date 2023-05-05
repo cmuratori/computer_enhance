@@ -1,0 +1,54 @@
+
+WARNING: Clocks reported by this utility are strictly from the 8086 manual.
+They will be inaccurate, both because the manual clocks are estimates, and because
+some of the entries in the manual look highly suspicious and are probably typos.
+
+--- test\listing_0061_DualScalar execution ---
+mov di, 8 ; Clocks: +4 = 4 | di:0x0->0x8 ip:0x0->0x3 
+mov bp, 1000 ; Clocks: +4 = 8 | bp:0x0->0x3e8 ip:0x3->0x6 
+mov byte [bp], 9 ; Clocks: +15 = 23 (10 + 5ea) | ip:0x6->0xa 
+mov byte [bp+1], 17 ; Clocks: +19 = 42 (10 + 9ea) | ip:0xa->0xe 
+mov byte [bp+2], 23 ; Clocks: +19 = 61 (10 + 9ea) | ip:0xe->0x12 
+mov byte [bp+3], 4 ; Clocks: +19 = 80 (10 + 9ea) | ip:0x12->0x16 
+mov byte [bp+4], 27 ; Clocks: +19 = 99 (10 + 9ea) | ip:0x16->0x1a 
+mov byte [bp+5], 41 ; Clocks: +19 = 118 (10 + 9ea) | ip:0x1a->0x1e 
+mov byte [bp+6], 39 ; Clocks: +19 = 137 (10 + 9ea) | ip:0x1e->0x22 
+mov byte [bp+7], 31 ; Clocks: +19 = 156 (10 + 9ea) | ip:0x22->0x26 
+test di, di ; Clocks: +3 = 159 | ip:0x26->0x28 
+je $+25 ; Clocks: +4 = 163 | ip:0x28->0x2a 
+mov cx, di ; Clocks: +2 = 165 | cx:0x0->0x8 ip:0x2a->0x2c 
+xor dx, dx ; Clocks: +3 = 168 | ip:0x2c->0x2e flags:->PZ 
+xor ax, ax ; Clocks: +3 = 171 | ip:0x2e->0x30 
+xor di, di ; Clocks: +3 = 174 | di:0x8->0x0 ip:0x30->0x32 
+add al, [bp+di] ; Clocks: +16 = 190 (9 + 7ea) | ax:0x0->0x9 ip:0x32->0x34 flags:PZ->P 
+add bl, [bp+di+1] ; Clocks: +20 = 210 (9 + 11ea) | bx:0x0->0x11 ip:0x34->0x37 
+add di, 2 ; Clocks: +4 = 214 | di:0x0->0x2 ip:0x37->0x3a flags:P-> 
+cmp di, cx ; Clocks: +3 = 217 | ip:0x3a->0x3c flags:->CPAS 
+jb $-10 ; Clocks: +16 = 233 | ip:0x3c->0x32 
+add al, [bp+di] ; Clocks: +16 = 249 (9 + 7ea) | ax:0x9->0x20 ip:0x32->0x34 flags:CPAS->A 
+add bl, [bp+di+1] ; Clocks: +20 = 269 (9 + 11ea) | bx:0x11->0x15 ip:0x34->0x37 flags:A-> 
+add di, 2 ; Clocks: +4 = 273 | di:0x2->0x4 ip:0x37->0x3a 
+cmp di, cx ; Clocks: +3 = 276 | ip:0x3a->0x3c flags:->CPAS 
+jb $-10 ; Clocks: +16 = 292 | ip:0x3c->0x32 
+add al, [bp+di] ; Clocks: +16 = 308 (9 + 7ea) | ax:0x20->0x3b ip:0x32->0x34 flags:CPAS-> 
+add bl, [bp+di+1] ; Clocks: +20 = 328 (9 + 11ea) | bx:0x15->0x3e ip:0x34->0x37 
+add di, 2 ; Clocks: +4 = 332 | di:0x4->0x6 ip:0x37->0x3a flags:->P 
+cmp di, cx ; Clocks: +3 = 335 | ip:0x3a->0x3c flags:P->CAS 
+jb $-10 ; Clocks: +16 = 351 | ip:0x3c->0x32 
+add al, [bp+di] ; Clocks: +16 = 367 (9 + 7ea) | ax:0x3b->0x62 ip:0x32->0x34 flags:CAS->A 
+add bl, [bp+di+1] ; Clocks: +20 = 387 (9 + 11ea) | bx:0x3e->0x5d ip:0x34->0x37 
+add di, 2 ; Clocks: +4 = 391 | di:0x6->0x8 ip:0x37->0x3a flags:A-> 
+cmp di, cx ; Clocks: +3 = 394 | ip:0x3a->0x3c flags:->PZ 
+jb $-10 ; Clocks: +4 = 398 | ip:0x3c->0x3e 
+add al, bl ; Clocks: +3 = 401 | ax:0x62->0xbf ip:0x3e->0x40 flags:PZ->SO 
+STOPONRET: Return encountered at address 64.
+
+Final registers:
+      ax: 0x00bf (191)
+      bx: 0x005d (93)
+      cx: 0x0008 (8)
+      bp: 0x03e8 (1000)
+      di: 0x0008 (8)
+      ip: 0x0040 (64)
+   flags: SO
+
