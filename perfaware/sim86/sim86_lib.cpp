@@ -10,9 +10,13 @@
    
    ======================================================================== */
 
+#ifndef __wasm__
+
 #include <assert.h>
 #include <memory.h>
 #include <stdio.h>
+
+#endif
 
 #include "sim86.h"
 
@@ -68,3 +72,4 @@ extern "C" void Sim86_Get8086InstructionTable(instruction_table *Dest)
 {
     *Dest = Get8086InstructionTable();
 }
+
