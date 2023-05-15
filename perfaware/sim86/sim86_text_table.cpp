@@ -1,9 +1,13 @@
 /* ========================================================================
-   $File: work/tools/sim86/sim86_text_table.cpp $
-   $Date: 2023/04/28 23:24:55 UTC $
-   $Revision: 1 $
-   $Creator: Casey Muratori $
-   $Notice: (C) Copyright by Molly Rocket, Inc., All Rights Reserved. $
+
+   (C) Copyright 2023 by Molly Rocket, Inc., All Rights Reserved.
+   
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any damages
+   arising from the use of this software.
+   
+   Please see https://computerenhance.com for more information
+   
    ======================================================================== */
 
 char const *OpcodeMnemonics[] =

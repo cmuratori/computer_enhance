@@ -1,9 +1,13 @@
 /* ========================================================================
-   $File: work/tools/sim86/sim86_cycles.h $
-   $Date: 2023/05/05 20:09:36 UTC $
-   $Revision: 4 $
-   $Creator: Casey Muratori $
-   $Notice: (C) Copyright by Molly Rocket, Inc., All Rights Reserved. $
+
+   (C) Copyright 2023 by Molly Rocket, Inc., All Rights Reserved.
+   
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any damages
+   arising from the use of this software.
+   
+   Please see https://computerenhance.com for more information
+   
    ======================================================================== */
 
 struct instruction_clock_interval
