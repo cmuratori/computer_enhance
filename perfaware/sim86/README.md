@@ -42,6 +42,6 @@ If you would like to do some of the homework using this decoder as a DLL, you ca
 * [contrib_rust](./shared/contrib_rust): Rust wrapper provided by [Robert Vally](https://github.com/shiver)
 * [contrib_jai](./shared/contrib_jai): JAI wrapper provided by [Tomasz Różański](https://github.com/tomasz-rozanski) and [Raphael Luba](https://github.com/rluba)
 * [contrib_ruby](./shared/contrib_ruby): Ruby wrapper provided by [David Grayson](https://github.com/DavidEGrayson)
-* [contrib_webassembly](./shared/contrib_webassembly): WebAssembly wrapper provided by [Gaurav Gautam]([gautam1168](https://github.com/gautam1168))
+* [contrib_webassembly](./shared/contrib_webassembly): WebAssembly wrapper provided by [Gaurav Gautam](https://github.com/gautam1168)
 
 \- Casey
