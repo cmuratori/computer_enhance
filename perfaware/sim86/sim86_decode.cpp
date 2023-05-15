@@ -10,28 +10,6 @@
    
    ======================================================================== */
 
-enum register_mapping_8086
-{
-    Register_none,
-    
-    Register_a,
-    Register_b,
-    Register_c,
-    Register_d,
-    Register_sp,
-    Register_bp,
-    Register_si,
-    Register_di,
-    Register_es,
-    Register_cs,
-    Register_ss,
-    Register_ds,
-    Register_ip,
-    Register_flags,
-    
-    Register_count,
-};
-
 struct decode_context
 {
     u32 DefaultSegment;
@@ -176,6 +154,11 @@ static instruction TryDecode(decode_context *Context, instruction_encoding *Inst
             Dest.Flags |= Inst_Far;
         }
         
+        if(Bits[Bits_Z])
+        {
+            Dest.Flags |= Inst_RepNE;
+        }
+        
         u32 Disp = Bits[Bits_Disp];
         s16 Displacement = (s16)Disp;
         
@@ -293,7 +276,7 @@ static instruction DecodeInstruction(instruction_table Table, segmented_access A
         }
         else if(Result.Op == Op_rep)
         {
-            Context.AdditionalFlags |= Inst_Rep;
+            Context.AdditionalFlags |= Inst_Rep | (Result.Flags & Inst_RepNE);
         }
         else if(Result.Op == Op_segment)
         {

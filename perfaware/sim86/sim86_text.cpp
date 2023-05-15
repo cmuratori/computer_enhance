@@ -10,55 +10,9 @@
    
    ======================================================================== */
 
-char const *OpcodeMnemonics[] =
-{
-    "",
-
-#define INST(Mnemonic, ...) #Mnemonic,
-#define INSTALT(...)
-#include "sim86_instruction_table.inl"
-};
-
-static char const *GetMnemonic(operation_type Op)
-{
-    char const *Result = "";
-    if(Op < Op_Count)
-    {
-        Result = OpcodeMnemonics[Op];
-    }
-    
-    return Result;
-}
-
-static char const *GetRegName(register_access Reg)
-{
-    char const *Names[][3] =
-    {
-        {"", "", ""},
-        {"al", "ah", "ax"},
-        {"bl", "bh", "bx"},
-        {"cl", "ch", "cx"},
-        {"dl", "dh", "dx"},
-        {"sp", "sp", "sp"},
-        {"bp", "bp", "bp"},
-        {"si", "si", "si"},
-        {"di", "di", "di"},
-        {"es", "es", "es"},
-        {"cs", "cs", "cs"},
-        {"ss", "ss", "ss"},
-        {"ds", "ds", "ds"},
-        {"ip", "ip", "ip"},
-        {"flags", "flags", "flags"}
-    };
-    
-    char const *Result = Names[Reg.Index % ArrayCount(Names)][(Reg.Count == 2) ? 2 : Reg.Offset&1];
-    return Result;
-}
-
 static void PrintEffectiveAddressExpression(effective_address_expression Address, FILE *Dest)
 {
     char const *Separator = "";
-    bool HasTerms = false;
     for(u32 Index = 0; Index < ArrayCount(Address.Terms); ++Index)
     {
         effective_address_term Term = Address.Terms[Index];
@@ -66,7 +20,6 @@ static void PrintEffectiveAddressExpression(effective_address_expression Address
         
         if(Reg.Index)
         {
-            HasTerms = true;
             fprintf(Dest, "%s", Separator);
             if(Term.Scale != 1)
             {
@@ -77,7 +30,7 @@ static void PrintEffectiveAddressExpression(effective_address_expression Address
         }
     }
     
-    if(Address.Displacement != 0 || !HasTerms)
+    if(Address.Displacement != 0)
     {
         fprintf(Dest, "%+d", Address.Displacement);
     }
@@ -103,7 +56,8 @@ static void PrintInstruction(instruction Instruction, FILE *Dest)
     char const *MnemonicSuffix = "";
     if(Flags & Inst_Rep)
     {
-        fprintf(Dest, "rep ");
+        u32 Z = Flags & Inst_RepNE;
+        fprintf(Dest, "%s ", Z ? "rep" : "repne");
         MnemonicSuffix = W ? "w" : "b";
     }
     
@@ -130,11 +84,6 @@ static void PrintInstruction(instruction Instruction, FILE *Dest)
                 case Operand_Memory:
                 {
                     effective_address_expression Address = Operand.Address;
-
-                    if(Flags & Inst_Far)
-                    {
-                        fprintf(Dest, "far ");
-                    }
                     
                     if(Address.Flags & Address_ExplicitSegment)
                     {
@@ -142,6 +91,11 @@ static void PrintInstruction(instruction Instruction, FILE *Dest)
                     }
                     else
                     {
+                        if(Flags & Inst_Far)
+                        {
+                            fprintf(Dest, "far ");
+                        }
+                        
                         if(Instruction.Operands[0].Type != Operand_Register)
                         {
                             fprintf(Dest, "%s ", W ? "word" : "byte");
@@ -172,5 +126,107 @@ static void PrintInstruction(instruction Instruction, FILE *Dest)
                 } break;
             }
         }
+    }
+}
+
+static void PrintFlags(u32 Value, FILE *Dest)
+{
+    if(Value & Flag_CF) {fprintf(Dest, "C");}
+    if(Value & Flag_PF) {fprintf(Dest, "P");}
+    if(Value & Flag_AF) {fprintf(Dest, "A");}
+    if(Value & Flag_ZF) {fprintf(Dest, "Z");}
+    if(Value & Flag_SF) {fprintf(Dest, "S");}
+    if(Value & Flag_TF) {fprintf(Dest, "T");}
+    if(Value & Flag_IF) {fprintf(Dest, "I");}
+    if(Value & Flag_DF) {fprintf(Dest, "D");}
+    if(Value & Flag_OF) {fprintf(Dest, "O");}
+}
+
+static void PrintRegisters(register_state_8086 *Registers, FILE *Dest)
+{
+    for(u32 RegIndex = 0; RegIndex < ArrayCount(Registers->u16); ++RegIndex)
+    {
+        u16 Value = Registers->u16[RegIndex];
+        
+        register_access Access = {};
+        Access.Index = RegIndex;
+        Access.Count = 2;
+        char const *Name = GetRegName(Access);
+        if(Value && *Name)
+        {
+            fprintf(Dest, "%8s: ", Name);
+            if(RegIndex == FLAGS_REGISTER_8086)
+            {
+                PrintFlags(Value, Dest);
+            }
+            else
+            {
+                fprintf(Dest, "0x%04x (%u)", Value, Value);
+            }
+            fprintf(Dest, "\n");
+        }
+    }
+}
+
+static void PrintRegisterDifference(register_state_8086 *Old, register_state_8086 *New, FILE *Dest)
+{
+    for(u32 RegIndex = 0; RegIndex < ArrayCount(Old->u16); ++RegIndex)
+    {
+        u16 OldVal = Old->u16[RegIndex];
+        u16 NewVal = New->u16[RegIndex];
+        
+        register_access Access = {};
+        Access.Index = RegIndex;
+        Access.Count = 2;
+        char const *Name = GetRegName(Access);
+        
+        if(OldVal != NewVal)
+        {
+            fprintf(Dest, "%s:", Name);
+            if(RegIndex == FLAGS_REGISTER_8086)
+            {
+                PrintFlags(OldVal, Dest);
+                fprintf(Dest, "->");
+                PrintFlags(NewVal, Dest);
+            }
+            else
+            {
+                fprintf(Dest, "0x%x->0x%x", OldVal, NewVal);
+            }
+            fprintf(Dest, " ");
+        }
+    }
+}
+
+static void PrintClockInterval(instruction_clock_interval Clocks, FILE *Dest)
+{
+    if(Clocks.Min != Clocks.Max)
+    {
+        fprintf(Dest, "[%u,%u]", Clocks.Min, Clocks.Max);
+    }
+    else
+    {
+        fprintf(Dest, "%u", Clocks.Min);
+    }
+}
+
+static void ExplainTiming(instruction_timing Timing, instruction_clock_interval Clocks, FILE *Dest)
+{
+    if(Timing.Base.Min != Clocks.Min)
+    {
+        fprintf(Dest, " (");
+        PrintClockInterval(Timing.Base, Dest);
+        if(Timing.EAClocks)
+        {
+            fprintf(Dest, " + %uea", Timing.EAClocks);
+        }
+        
+        u32 Penalty = Clocks.Min - (Timing.Base.Min + Timing.EAClocks);
+        if(Penalty)
+        {
+            fprintf(Dest, " + %up", Penalty);
+        }
+        
+        fprintf(Dest, ")");
     }
 }

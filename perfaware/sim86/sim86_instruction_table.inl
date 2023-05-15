@@ -21,7 +21,7 @@
 */
 
 #ifndef INST
-#define INST(Mnemonic, Encoding, ...) {Op_##Mnemonic, Encoding, __VA_ARGS__},
+#define INST(Mnemonic, ...) {Op_##Mnemonic, __VA_ARGS__},
 #endif
 
 #ifndef INSTALT
@@ -62,13 +62,13 @@ INSTALT(mov, {B(1010000), W, ADDR, ImpREG(0), ImpMOD(0), ImpRM(0b110), ImpD(1)})
 INSTALT(mov, {B(1010001), W, ADDR, ImpREG(0), ImpMOD(0), ImpRM(0b110), ImpD(0)})
 INSTALT(mov, {B(100011), D, B(0), MOD, B(0), SR, RM, ImpW(1)}) // NOTE(casey): This collapses 2 entries in the 8086 table by adding an explicit D bit
 
-INST(push, {B(11111111), MOD, B(110), RM, ImpW(1)})
-INSTALT(push, {B(01010), REG, ImpW(1)})
-INSTALT(push, {B(000), SR, B(110), ImpW(1)})
+INST(push, {B(11111111), MOD, B(110), RM, ImpW(1), ImpD(1)})
+INSTALT(push, {B(01010), REG, ImpW(1), ImpD(1)})
+INSTALT(push, {B(000), SR, B(110), ImpW(1), ImpD(1)})
 
-INST(pop, {B(10001111), MOD, B(000), RM, ImpW(1)})
-INSTALT(pop, {B(01011), REG, ImpW(1)})
-INSTALT(pop, {B(000), SR, B(111), ImpW(1)})
+INST(pop, {B(10001111), MOD, B(000), RM, ImpW(1), ImpD(1)})
+INSTALT(pop, {B(01011), REG, ImpW(1), ImpD(1)})
+INSTALT(pop, {B(000), SR, B(111), ImpW(1), ImpD(1)})
 
 INST(xchg, {B(1000011), W, MOD, REG, RM, ImpD(1)})
 INSTALT(xchg, {B(10010), REG, ImpMOD(0b11), ImpW(1), ImpRM(0)})
@@ -95,8 +95,8 @@ INST(adc, {B(000100), D, W, MOD, REG, RM})
 INSTALT(adc, {B(100000), S, W, MOD, B(010), RM, DATA, DATA_IF_W})
 INSTALT(adc, {B(0001010), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)})
 
-INST(inc, {B(1111111), W, MOD, B(000), RM})
-INSTALT(inc, {B(01000), REG, ImpW(1)})
+INST(inc, {B(1111111), W, MOD, B(000), RM, ImpD(1)})
+INSTALT(inc, {B(01000), REG, ImpW(1), ImpD(1)})
 
 INST(aaa, {B(00110111)})
 INST(daa, {B(00100111)})
@@ -109,8 +109,8 @@ INST(sbb, {B(000110), D, W, MOD, REG, RM})
 INSTALT(sbb, {B(100000), S, W, MOD, B(011), RM, DATA, DATA_IF_W})
 INSTALT(sbb, {B(0001110), W, DATA, DATA_IF_W, ImpREG(0), ImpD(1)})
 
-INST(dec, {B(1111111), W, MOD, B(001), RM})
-INSTALT(dec, {B(01001), REG, ImpW(1)})
+INST(dec, {B(1111111), W, MOD, B(001), RM, ImpD(1)})
+INSTALT(dec, {B(01001), REG, ImpW(1), ImpD(1)})
 
 INST(neg, {B(1111011), W, MOD, B(011), RM})
 
@@ -163,21 +163,21 @@ INST(stos, {B(1010101), W})
 
 INST(call, {B(11101000), ADDR, Flags(Bits_RelJMPDisp)})
 INSTALT(call, {B(11111111), MOD, B(010), RM, ImpW(1)})
-INSTALT(call, {B(10011010), ADDR, DATA, DATA_IF_W, ImpW(1)})
+INSTALT(call, {B(10011010), ADDR, DATA, DATA_IF_W, ImpW(1), Flags(Bits_Far)})
 INSTALT(call, {B(11111111), MOD, B(011), RM, ImpW(1), Flags(Bits_Far)})
 
 INST(jmp, {B(11101001), ADDR, Flags(Bits_RelJMPDisp)})
 INSTALT(jmp, {B(11101011), DISP, Flags(Bits_RelJMPDisp)})
 INSTALT(jmp, {B(11111111), MOD, B(100), RM, ImpW(1)})
-INSTALT(jmp, {B(11101010), ADDR, DATA, DATA_IF_W, ImpW(1)})
+INSTALT(jmp, {B(11101010), ADDR, DATA, DATA_IF_W, ImpW(1), Flags(Bits_Far)})
 INSTALT(jmp, {B(11111111), MOD, B(101), RM, ImpW(1), Flags(Bits_Far)})
 
 // NOTE(casey): The actual Intel manual does not distinguish mnemonics RET and RETF,
 // but NASM needs this to reassemble properly, so we do.
 INST(ret, {B(11000011)})
 INSTALT(ret, {B(11000010), DATA, DATA_IF_W, ImpW(1)})
-INST(retf, {B(11001011)})
-INSTALT(retf, {B(11001010), DATA, DATA_IF_W, ImpW(1)})
+INST(retf, {B(11001011), Flags(Bits_Far)})
+INSTALT(retf, {B(11001010), DATA, DATA_IF_W, ImpW(1), Flags(Bits_Far)})
 
 INST(je, {B(01110100), DISP, Flags(Bits_RelJMPDisp)})
 INST(jl, {B(01111100), DISP, Flags(Bits_RelJMPDisp)})

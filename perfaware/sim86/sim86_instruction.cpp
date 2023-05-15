@@ -10,6 +10,19 @@
    
    ======================================================================== */
 
+static b32 OperandIsType(instruction Instruction, u32 Index, operand_type Type)
+{
+    b32 Result = (Instruction.Operands[Index].Type == Type);
+    return Result;
+}
+
+static instruction_operand GetOperand(instruction Instruction, u32 Index)
+{
+    assert(Index < ArrayCount(Instruction.Operands));
+    instruction_operand Result = Instruction.Operands[Index];
+    return Result;
+}
+
 static register_access RegisterAccess(u32 Index, u32 Offset, u32 Count)
 {
     register_access Result = {};

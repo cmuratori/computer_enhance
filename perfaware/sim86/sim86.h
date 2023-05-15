@@ -24,4 +24,4 @@ typedef s32 b32;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 
-static u32 const SIM86_VERSION = 3;
+static u32 const SIM86_VERSION = 4;
