@@ -12,6 +12,8 @@
 
 static void PrintEffectiveAddressExpression(effective_address_expression Address, FILE *Dest)
 {
+    b32 HadTerms = false;
+    
     char const *Separator = "";
     for(u32 Index = 0; Index < ArrayCount(Address.Terms); ++Index)
     {
@@ -27,10 +29,12 @@ static void PrintEffectiveAddressExpression(effective_address_expression Address
             }
             fprintf(Dest, "%s", GetRegName(Reg));
             Separator = "+";
+            
+            HadTerms = true;
         }
     }
     
-    if(Address.Displacement != 0)
+    if(!HadTerms || (Address.Displacement != 0))
     {
         fprintf(Dest, "%+d", Address.Displacement);
     }
