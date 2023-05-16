@@ -172,13 +172,16 @@ static void UpdateArithFlags(register_state_8086 *Registers, u32 UnmaskedResult,
     UpdateCommonFlags(Registers, MaskedResult, WWidth);
 }
 
+static void UpdateLogFlags(register_state_8086 *Registers, u16 MaskedResult, u32 WWidth)
+{
+    Registers->flags &= ~(Flag_OF | Flag_CF | Flag_AF);
+    UpdateCommonFlags(Registers, MaskedResult, WWidth);
+}
+
 static void WriteLogOpResult(register_state_8086 *Registers, segmented_access Dest, u16 UnmaskedResult, u32 WWidth)
 {
     u16 MaskedResult = UnmaskedResult & WidthMaskFor(WWidth);
-    
-    Registers->flags &= ~(Flag_OF | Flag_CF | Flag_AF);
-    UpdateCommonFlags(Registers, MaskedResult, WWidth);
-    
+    UpdateLogFlags(Registers, MaskedResult, WWidth);
     WriteN(Dest, 0, MaskedResult, WWidth);
 }
 
@@ -599,7 +602,7 @@ static exec_result ExecInstruction(segmented_access Memory, register_state_8086 
         
         case Op_test:
         {
-            WriteLogOpResult(Registers, Op0, V0 & V1, WWidth);
+            UpdateLogFlags(Registers, V0 & V1, WWidth);
         } break;
         
         case Op_or:
