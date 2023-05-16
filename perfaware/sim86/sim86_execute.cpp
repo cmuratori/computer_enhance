@@ -637,7 +637,11 @@ static exec_result ExecInstruction(segmented_access Memory, register_state_8086 
             }
             
             Push(Memory, Registers, Registers->ip);
-            //Registers->ip = Target.Address.;
+
+            // TODO(casey): This is not actually complete.
+            // It needs the IP to be updated here.
+            
+            Result.Unimplemented = true;
         }
         
         case Op_jmp:
