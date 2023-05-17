@@ -6,3 +6,4 @@ Below is a list of shared code and videos from people's solutions to the Perform
 
 * [@cmuratori](https://github.com/cmuratori) - Reference 8086 decoder and cycle count estimator ([github](https://github.com/cmuratori/computer_enhance/tree/main/perfaware/sim86))
 * Seth ([github](https://github.com/SethArchambault/Performance-Aware-Programming))
+* [@jeng](https://github.com/jeng) - ImGui version with debugging features ([codeberg](https://codeberg.org/jeng/Sim8088)) ([youtube](https://youtu.be/KOn6WozGtVk))
