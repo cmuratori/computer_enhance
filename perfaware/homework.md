@@ -6,3 +6,4 @@ Below is a list of shared code and videos from people's solutions to the Perform
 
 * [@cmuratori](https://github.com/cmuratori) - Reference 8086 decoder and cycle count estimator ([github](https://github.com/cmuratori/computer_enhance/tree/main/perfaware/sim86))
 * Seth ([github](https://github.com/SethArchambault/Performance-Aware-Programming))
+* [Webassembly](https://github.com/gautam1168/gautam1168.github.io/tree/main/Part10-8086) - Homeworks done using the reference decoder. The code in this repository uses the webassembly contrib in the main repo. However, there is a bit more C++ code on top of what exits in the contrib folder in the main repository. This can be found in my [fork](https://github.com/gautam1168/computer_enhance/tree/wasm). The [live page](https://gautam1168.github.io/Part10-8086/index.html) shows the working homeworks.
