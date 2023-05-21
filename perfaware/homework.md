@@ -11,3 +11,4 @@ Below is a list of shared code and videos from people's solutions to the Perform
 * [@kiroxas](https://github.com/kiroxas) - ([Github](https://github.com/kiroxas/ComputerEnhance/tree/main)) ([Youtube](https://youtu.be/-OW_lgkXy2k))
 * [@santiagocabrera96](https://github.com/santiagocabrera96) - [Solution in Clojure](https://github.com/santiagocabrera96/computer-enhance)
 * [@PinataMostGrim](https://github.com/PinataMostGrim) - [Solution in C](https://github.com/PinataMostGrim/perfaware)
+* Ethan (homework in [C#](https://github.com/ethanfischer/computer_enhance))
