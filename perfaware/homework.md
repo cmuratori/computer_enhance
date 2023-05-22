@@ -12,3 +12,4 @@ Below is a list of shared code and videos from people's solutions to the Perform
 * [@santiagocabrera96](https://github.com/santiagocabrera96) - [Solution in Clojure](https://github.com/santiagocabrera96/computer-enhance)
 * [@PinataMostGrim](https://github.com/PinataMostGrim) - [Solution in C](https://github.com/PinataMostGrim/perfaware)
 * [@ethanfischer](https://github.com/ethanfischer) ([homework in C#](https://github.com/ethanfischer/computer_enhance))
+* [@Said6289](https://github.com/Said6289) - [Solution to listings 37 - 40 in x64 assembly](https://github.com/Said6289/perf_aware_course/tree/main/instruction_decode). This was my first attempt to write something more substantial in assembly. It was very time-consuming and so I only did the first few assignments.
