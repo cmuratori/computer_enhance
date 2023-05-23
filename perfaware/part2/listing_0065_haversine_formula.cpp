@@ -24,7 +24,7 @@ static f64 Square(f64 A)
 
 static f64 RadiansFromDegrees(f64 Degrees)
 {
-    f64 Result = 0.01745329251994329577f * Degrees;
+    f64 Result = 0.01745329251994329577 * Degrees;
     return Result;
 }
 
