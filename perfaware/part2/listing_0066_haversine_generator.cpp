@@ -14,6 +14,15 @@
    LISTING 66
    ======================================================================== */
 
+/* NOTE(casey): _CRT_SECURE_NO_WARNINGS is here because otherwise we cannot
+   call fopen(). If we replace fopen() with fopen_s() to avoid the warning,
+   then the code doesn't compile on Linux anymore, since fopen_s() does not
+   exist there.
+   
+   What exactly the CRT maintainers were thinking when they made this choice,
+   I have no idea. */
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -125,9 +134,8 @@ static f64 ReferenceHaversine(f64 X0, f64 Y0, f64 X1, f64 Y1, f64 EarthRadius)
 static FILE *Open(long long unsigned PairCount, char *Label, char *Extension)
 {
     char Temp[256];
-    sprintf_s(Temp, "data_%llu_%s.%s", PairCount, Label, Extension);
-    FILE *Result = 0;
-    fopen_s(&Result, Temp, "wb");
+    sprintf(Temp, "data_%llu_%s.%s", PairCount, Label, Extension);
+    FILE *Result = fopen(Temp, "wb");
     if(!Result)
     {
         fprintf(stderr, "Unable to open \"%s\" for writing.\n", Temp);
