@@ -1,9 +1,17 @@
 /* ========================================================================
-   $File: work/course/haversine/listing_0070_haversine_math.cpp $
-   $Date: 2023/05/31 02:23:49 UTC $
-   $Revision: 1 $
-   $Creator: Casey Muratori $
-   $Notice: (C) Copyright by Molly Rocket, Inc., All Rights Reserved. $
+
+   (C) Copyright 2023 by Molly Rocket, Inc., All Rights Reserved.
+   
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any damages
+   arising from the use of this software.
+   
+   Please see https://computerenhance.com for more information
+   
+   ======================================================================== */
+
+/* ========================================================================
+   LISTING 70
    ======================================================================== */
 
 static f64 Square(f64 A)
