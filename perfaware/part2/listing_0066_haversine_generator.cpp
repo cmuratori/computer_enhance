@@ -25,24 +25,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <math.h>
 #include <string.h>
 
+typedef uint32_t u32;
+typedef uint64_t u64;
 typedef double f64;
-typedef unsigned int u32;
-typedef unsigned int long long u64;
-#define U64Max 0xffffffffffffffffui64
+#define U64Max UINT64_MAX
+
+#include "listing_0065_haversine_formula.cpp"
 
 struct random_series
 {
     u64 A, B, C, D;
 };
-
-static f64 Square(f64 A)
-{
-    f64 Result = (A*A);
-    return Result;
-}
 
 static u64 RotateLeft(u64 V, int Shift)
 {
@@ -95,38 +92,6 @@ static f64 RandomInRange(random_series *Series, f64 Min, f64 Max)
 {
     f64 t = (f64)RandomU64(Series) / (f64)U64Max;
     f64 Result = (1.0 - t)*Min + t*Max;
-    
-    return Result;
-}
-
-static f64 RadiansFromDegrees(f64 Degrees)
-{
-    f64 Result = 0.01745329251994329577 * Degrees;
-    return Result;
-}
-
-static f64 ReferenceHaversine(f64 X0, f64 Y0, f64 X1, f64 Y1, f64 EarthRadius)
-{
-    /* NOTE(casey): This is not meant to be a "good" way to calculate the Haversine distance.
-       Instead, it attempts to follow, as closely as possible, the formula used in the real-world
-       question on which these homework exercises are loosely based.
-    */
-    
-    f64 lat1 = Y0;
-    f64 lat2 = Y1;
-    f64 lon1 = X0;
-    f64 lon2 = X1;
-    
-    f64 dLat = RadiansFromDegrees(lat2 - lat1);
-    f64 dLon = RadiansFromDegrees(lon2 - lon1);
-    lat1 = RadiansFromDegrees(lat1);
-    lat2 = RadiansFromDegrees(lat2);
-    
-    f64 a = Square(sin(dLat/2.0)) + cos(lat1)*cos(lat2)*Square(sin(dLon/2));
-    f64 c = 2.0*asin(sqrt(a));
-    
-    f64 EuclideanDistance = sqrt(Square(X1 - X0) + Square(Y1 - Y0));
-    f64 Result = EarthRadius * c;
     
     return Result;
 }

@@ -44,9 +44,9 @@ struct haversine_pair
     f64 X1, Y1;
 };
 
+#include "listing_0065_haversine_formula.cpp"
 #include "listing_0068_buffer.cpp"
 #include "listing_0069_lookup_json_parser.cpp"
-#include "listing_0070_haversine_math.cpp"
 
 static buffer ReadEntireFile(char *FileName)
 {

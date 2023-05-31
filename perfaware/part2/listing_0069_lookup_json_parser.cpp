@@ -27,7 +27,6 @@ enum json_token_type
     Token_colon,
     Token_semi_colon,
     Token_string_literal,
-    Token_minus,
     Token_number,
     Token_true,
     Token_false,
@@ -42,20 +41,13 @@ struct json_token
     buffer Value;
 };
 
-struct json_object;
-struct json_field
+struct json_element
 {
     buffer Label;
     buffer Value;
-    json_object *SubObject;
+    json_element *FirstSubElement;
     
-    json_field *NextSibling;
-};
-
-struct json_object
-{
-    json_field *FirstField;
-    json_object *NextSibling;
+    json_element *NextSibling;
 };
 
 struct json_parser
@@ -257,19 +249,19 @@ static json_token GetJSONToken(json_parser *Parser)
     return Result;
 }
 
-static json_object *ParseJSONList(json_parser *Parser, json_token StartingToken, json_token_type EndType, b32 HasLabels);
-static json_field *ParseJSONField(json_parser *Parser, buffer Label, json_token Value)
+static json_element *ParseJSONList(json_parser *Parser, json_token StartingToken, json_token_type EndType, b32 HasLabels);
+static json_element *ParseJSONElement(json_parser *Parser, buffer Label, json_token Value)
 {
     b32 Valid = true;
     
-    json_object *SubObject = 0;
+    json_element *SubElement = 0;
     if(Value.Type == Token_open_bracket)
     {
-        SubObject = ParseJSONList(Parser, Value, Token_close_bracket, false);
+        SubElement = ParseJSONList(Parser, Value, Token_close_bracket, false);
     }
     else if(Value.Type == Token_open_brace)
     {
-        SubObject = ParseJSONList(Parser, Value, Token_close_brace, true);
+        SubElement = ParseJSONList(Parser, Value, Token_close_brace, true);
     }
     else if((Value.Type == Token_string_literal) ||
             (Value.Type == Token_true) ||
@@ -284,24 +276,24 @@ static json_field *ParseJSONField(json_parser *Parser, buffer Label, json_token 
         Valid = false;
     }
     
-    json_field *Result = 0;
+    json_element *Result = 0;
     
     if(Valid)
     {
-        Result = (json_field *)malloc(sizeof(json_field));
+        Result = (json_element *)malloc(sizeof(json_element));
         Result->Label = Label;
         Result->Value = Value.Value;
-        Result->SubObject = SubObject;
+        Result->FirstSubElement = SubElement;
         Result->NextSibling = 0;
     }
     
     return Result;
 }
 
-static json_object *ParseJSONList(json_parser *Parser, json_token StartingToken, json_token_type EndType, b32 HasLabels)
+static json_element *ParseJSONList(json_parser *Parser, json_token StartingToken, json_token_type EndType, b32 HasLabels)
 {
-    json_field *FirstField = {};
-    json_field *LastField = {};
+    json_element *FirstElement = {};
+    json_element *LastElement = {};
     
     while(IsParsing(Parser))
     {
@@ -329,10 +321,10 @@ static json_object *ParseJSONList(json_parser *Parser, json_token StartingToken,
             }
         }
         
-        json_field *Field = ParseJSONField(Parser, Label, Value);
-        if(Field)
+        json_element *Element = ParseJSONElement(Parser, Label, Value);
+        if(Element)
         {
-            LastField = (LastField ? LastField->NextSibling : FirstField) = Field;
+            LastElement = (LastElement ? LastElement->NextSibling : FirstElement) = Element;
         }
         else if(Value.Type == EndType)
         {
@@ -354,58 +346,39 @@ static json_object *ParseJSONList(json_parser *Parser, json_token StartingToken,
         }
     }
     
-    json_object *Result = (json_object *)malloc(sizeof(json_object));
-    if(Result)
-    {
-        Result->FirstField = FirstField;
-        Result->NextSibling = 0;
-    }
-    else
-    {
-        Error(Parser, StartingToken, "Unable to allocate storage for JSON object");
-    }
-    
-    return Result;
+    return FirstElement;
 }
 
-static json_field *ParseJSON(buffer InputJSON)
+static json_element *ParseJSON(buffer InputJSON)
 {
     json_parser Parser = {};
     Parser.Source = InputJSON;
     
-    json_field *Result = ParseJSONField(&Parser, {}, GetJSONToken(&Parser));
+    json_element *Result = ParseJSONElement(&Parser, {}, GetJSONToken(&Parser));
     return Result;
 }
 
-static void FreeJSON(json_field *Field)
+static void FreeJSON(json_element *Element)
 {
-    while(Field)
+    while(Element)
     {
-        json_field *FreeField = Field;
-        Field = Field->NextSibling;
+        json_element *FreeElement = Element;
+        Element = Element->NextSibling;
     
-        json_object *Object = FreeField->SubObject;
-        while(Object)
-        {
-            json_object *FreeObject = Object;
-            Object = Object->NextSibling;
-            
-            FreeJSON(FreeObject->FirstField);
-            free(FreeObject);
-        }        
-        free(FreeField);
+        FreeJSON(FreeElement->FirstSubElement);
+        free(FreeElement);
     }
 }
 
-static json_field *LookupField(json_object *Object, buffer FieldName)
+static json_element *LookupElement(json_element *Object, buffer ElementName)
 {
-    json_field *Result = 0;
+    json_element *Result = 0;
     
     if(Object)
     {
-        for(json_field *Search = Object->FirstField; Search; Search = Search->NextSibling)
+        for(json_element *Search = Object->FirstSubElement; Search; Search = Search->NextSibling)
         {
-            if(AreEqual(Search->Label, FieldName))
+            if(AreEqual(Search->Label, ElementName))
             {
                 Result = Search;
                 break;
@@ -456,14 +429,14 @@ static f64 ConvertJSONNumber(buffer Source, u64 *AtResult)
     return Result;
 }
 
-static f64 ConvertFieldToF64(json_object *Object, buffer FieldName)
+static f64 ConvertElementToF64(json_element *Object, buffer ElementName)
 {
     f64 Result = 0.0;
     
-    json_field *Field = LookupField(Object, FieldName);
-    if(Field)
+    json_element *Element = LookupElement(Object, ElementName);
+    if(Element)
     {
-        buffer Source = Field->Value;
+        buffer Source = Element->Value;
         u64 At = 0;
         
         f64 Sign = ConvertJSONSign(Source, &At);
@@ -512,20 +485,20 @@ static u64 ParseHaversinePairs(buffer InputJSON, u64 MaxPairCount, haversine_pai
 {
     u64 PairCount = 0;
     
-    json_field *JSON = ParseJSON(InputJSON);
-    json_field *PairsField = LookupField(JSON->SubObject, CONSTANT_STRING("pairs"));
-    if(PairsField && PairsField->SubObject)
+    json_element *JSON = ParseJSON(InputJSON);
+    json_element *PairsArray = LookupElement(JSON, CONSTANT_STRING("pairs"));
+    if(PairsArray)
     {
-        for(json_field *Element = PairsField->SubObject->FirstField;
+        for(json_element *Element = PairsArray->FirstSubElement;
             Element && (PairCount < MaxPairCount);
             Element = Element->NextSibling)
         {
             haversine_pair *Pair = Pairs + PairCount++;
             
-            Pair->X0 = ConvertFieldToF64(Element->SubObject, CONSTANT_STRING("x0"));
-            Pair->Y0 = ConvertFieldToF64(Element->SubObject, CONSTANT_STRING("y0"));
-            Pair->X1 = ConvertFieldToF64(Element->SubObject, CONSTANT_STRING("x1"));
-            Pair->Y1 = ConvertFieldToF64(Element->SubObject, CONSTANT_STRING("y1"));
+            Pair->X0 = ConvertElementToF64(Element, CONSTANT_STRING("x0"));
+            Pair->Y0 = ConvertElementToF64(Element, CONSTANT_STRING("y0"));
+            Pair->X1 = ConvertElementToF64(Element, CONSTANT_STRING("x1"));
+            Pair->Y1 = ConvertElementToF64(Element, CONSTANT_STRING("y1"));
         }
     }
     
