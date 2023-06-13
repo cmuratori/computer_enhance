@@ -3,10 +3,19 @@
 setlocal 
 
 set buildtype=%2
-if "%~2"=="" set buildtype=rc
-for %%g in (build\*%1_*_%buildtype%.exe) DO (
-	echo %%g
-	call %%g %3 %4 %5 %6 %7 %8 %9
+set buildname=
+if "%~2"=="" set buildtype=r?
+if not "%~1"=="" for %%g in (build\*%1_*_%buildtype%.exe) DO (
+	set buildname=%%g
 )
+
+if not "%buildname%"=="" (
+	echo.
+	echo ============ %buildname% ============ 
+	echo.
+	call %buildname%
+)
+
+if "%buildname%"=="" echo No matching executable.
 
 endlocal
