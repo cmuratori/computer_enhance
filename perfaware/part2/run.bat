@@ -9,13 +9,13 @@ if not "%~1"=="" for %%g in (build\*%1_*_%buildtype%.exe) DO (
 	set buildname=%%g
 )
 
+if "%buildname%"=="" echo No matching executable.
+
 if not "%buildname%"=="" (
 	echo.
 	echo ============ %buildname% ============ 
 	echo.
 	call %buildname%
 )
-
-if "%buildname%"=="" echo No matching executable.
 
 endlocal
