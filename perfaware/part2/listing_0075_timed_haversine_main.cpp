@@ -139,9 +139,9 @@ int main(int ArgCount, char **Args)
 				Prof_Sum = ReadCPUTimer();
                 f64 Sum = SumHaversineDistances(PairCount, Pairs);
                 Prof_MiscOutput = ReadCPUTimer();
-
+                
 				Result = 0;
-
+                
                 fprintf(stdout, "Input size: %llu\n", InputJSON.Count);
                 fprintf(stdout, "Pair count: %llu\n", PairCount);
                 fprintf(stdout, "Haversine sum: %.16f\n", Sum);
@@ -176,7 +176,7 @@ int main(int ArgCount, char **Args)
         {
             fprintf(stderr, "ERROR: Malformed input JSON\n");
         }
-
+        
         FreeBuffer(&InputJSON);
     }
     else
@@ -184,13 +184,13 @@ int main(int ArgCount, char **Args)
         fprintf(stderr, "Usage: %s [haversine_input.json]\n", Args[0]);
         fprintf(stderr, "       %s [haversine_input.json] [answers.f64]\n", Args[0]);
     }
-
+    
 	Prof_End = ReadCPUTimer();
-
+    
 	if(Result == 0)
 	{
 		u64 TotalCPUElapsed = Prof_End - Prof_Begin;
-
+        
 		u64 CPUFreq = EstimateCPUTimerFreq();
 		if(CPUFreq)
 		{
@@ -204,6 +204,6 @@ int main(int ArgCount, char **Args)
 		PrintTimeElapsed("Sum", TotalCPUElapsed, Prof_Sum, Prof_MiscOutput);
 		PrintTimeElapsed("MiscOutput", TotalCPUElapsed, Prof_MiscOutput, Prof_End);
 	}
-		
+    
     return Result;
 }
