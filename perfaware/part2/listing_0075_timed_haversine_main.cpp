@@ -100,28 +100,28 @@ static f64 SumHaversineDistances(u64 PairCount, haversine_pair *Pairs)
 
 static void PrintTimeElapsed(char const *Label, u64 TotalTSCElapsed, u64 Begin, u64 End)
 {
-	u64 Elapsed = End - Begin;
-	f64 Percent = 100.0 * ((f64)Elapsed / (f64)TotalTSCElapsed);
-	printf("  %s: %llu (%.2f%%)\n", Label, Elapsed, Percent);
+    u64 Elapsed = End - Begin;
+    f64 Percent = 100.0 * ((f64)Elapsed / (f64)TotalTSCElapsed);
+    printf("  %s: %llu (%.2f%%)\n", Label, Elapsed, Percent);
 }
 
 int main(int ArgCount, char **Args)
 {
-	u64 Prof_Begin = 0;
-	u64 Prof_Read = 0;
-	u64 Prof_MiscSetup = 0;
-	u64 Prof_Parse = 0;
-	u64 Prof_Sum = 0;
-	u64 Prof_MiscOutput = 0;
-	u64 Prof_End = 0;
-	
-	Prof_Begin = ReadCPUTimer();
-	
+    u64 Prof_Begin = 0;
+    u64 Prof_Read = 0;
+    u64 Prof_MiscSetup = 0;
+    u64 Prof_Parse = 0;
+    u64 Prof_Sum = 0;
+    u64 Prof_MiscOutput = 0;
+    u64 Prof_End = 0;
+    
+    Prof_Begin = ReadCPUTimer();
+    
     int Result = 1;
     
     if((ArgCount == 2) || (ArgCount == 3))
     {
-		Prof_Read = ReadCPUTimer();
+        Prof_Read = ReadCPUTimer();
         buffer InputJSON = ReadEntireFile(Args[1]);
         Prof_MiscSetup = ReadCPUTimer();
         
@@ -133,14 +133,14 @@ int main(int ArgCount, char **Args)
             if(ParsedValues.Count)
             {
                 haversine_pair *Pairs = (haversine_pair *)ParsedValues.Data;
-				
-				Prof_Parse = ReadCPUTimer();
+                
+                Prof_Parse = ReadCPUTimer();
                 u64 PairCount = ParseHaversinePairs(InputJSON, MaxPairCount, Pairs);
-				Prof_Sum = ReadCPUTimer();
+                Prof_Sum = ReadCPUTimer();
                 f64 Sum = SumHaversineDistances(PairCount, Pairs);
                 Prof_MiscOutput = ReadCPUTimer();
                 
-				Result = 0;
+                Result = 0;
                 
                 fprintf(stdout, "Input size: %llu\n", InputJSON.Count);
                 fprintf(stdout, "Pair count: %llu\n", PairCount);
@@ -185,25 +185,25 @@ int main(int ArgCount, char **Args)
         fprintf(stderr, "       %s [haversine_input.json] [answers.f64]\n", Args[0]);
     }
     
-	Prof_End = ReadCPUTimer();
+    Prof_End = ReadCPUTimer();
     
-	if(Result == 0)
-	{
-		u64 TotalCPUElapsed = Prof_End - Prof_Begin;
+    if(Result == 0)
+    {
+        u64 TotalCPUElapsed = Prof_End - Prof_Begin;
         
-		u64 CPUFreq = EstimateCPUTimerFreq();
-		if(CPUFreq)
-		{
-			printf("\nTotal time: %0.4fms (CPU freq %llu)\n", 1000.0 * (f64)TotalCPUElapsed / (f64)CPUFreq, CPUFreq);
-		}
-		
-		PrintTimeElapsed("Startup", TotalCPUElapsed, Prof_Begin, Prof_Read);
-		PrintTimeElapsed("Read", TotalCPUElapsed, Prof_Read, Prof_MiscSetup);
-		PrintTimeElapsed("MiscSetup", TotalCPUElapsed, Prof_MiscSetup, Prof_Parse);
-		PrintTimeElapsed("Parse", TotalCPUElapsed, Prof_Parse, Prof_Sum);
-		PrintTimeElapsed("Sum", TotalCPUElapsed, Prof_Sum, Prof_MiscOutput);
-		PrintTimeElapsed("MiscOutput", TotalCPUElapsed, Prof_MiscOutput, Prof_End);
-	}
+        u64 CPUFreq = EstimateCPUTimerFreq();
+        if(CPUFreq)
+        {
+            printf("\nTotal time: %0.4fms (CPU freq %llu)\n", 1000.0 * (f64)TotalCPUElapsed / (f64)CPUFreq, CPUFreq);
+        }
+        
+        PrintTimeElapsed("Startup", TotalCPUElapsed, Prof_Begin, Prof_Read);
+        PrintTimeElapsed("Read", TotalCPUElapsed, Prof_Read, Prof_MiscSetup);
+        PrintTimeElapsed("MiscSetup", TotalCPUElapsed, Prof_MiscSetup, Prof_Parse);
+        PrintTimeElapsed("Parse", TotalCPUElapsed, Prof_Parse, Prof_Sum);
+        PrintTimeElapsed("Sum", TotalCPUElapsed, Prof_Sum, Prof_MiscOutput);
+        PrintTimeElapsed("MiscOutput", TotalCPUElapsed, Prof_MiscOutput, Prof_End);
+    }
     
     return Result;
 }
