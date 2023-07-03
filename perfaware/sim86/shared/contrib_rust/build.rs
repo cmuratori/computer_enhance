@@ -10,14 +10,26 @@ fn main() {
     println!("cargo:rerun-if-changed={}", header_file.display());
 
     // Compile the library ourselves so we don't need to rely on the existing platform specific binaries
-    cc::Build::new()
+    let mut build = cc::Build::new();
+
+    if cfg!(target_os = "linux") {
+        build
+            .flag("-std=c++17")
+            .flag("-Wno-missing-field-initializers")
+            .flag("-Wno-unused-function");
+    } else {
+        build.flag("/std:c++17");
+    }
+
+    build
+        .cpp(true)
         .file(lib_path.join("../sim86_lib.cpp"))
-        .flag("-std=c++17")
-        .flag("-Wno-missing-field-initializers")
-        .flag("-Wno-unused-function")
         .compile("sim86_shared");
 
     let bindings = bindgen::Builder::default()
+        .clang_arg("--std=c++17")
+        .clang_arg("-x")
+        .clang_arg("c++")
         .header("../sim86_shared.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
