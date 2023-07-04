@@ -46,7 +46,7 @@ struct profile_block
         u64 Elapsed = ReadCPUTimer() - StartTSC;
         
         profile_anchor *Anchor = GlobalProfiler.Anchors + AnchorIndex;
-        Anchor->TSCElapsed = Elapsed;
+        Anchor->TSCElapsed += Elapsed;
         ++Anchor->HitCount;
                 
         /* NOTE(casey): This write happens every time solely because there is no
