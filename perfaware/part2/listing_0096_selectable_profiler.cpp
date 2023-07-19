@@ -125,9 +125,10 @@ static profiler GlobalProfiler;
 
 #define TimeFunction TimeBlock(__func__)
 
-inline void IgnoreEstimateCPUTimerFreq() {(void)&EstimateCPUTimerFreq;} // NOTE(casey): This has to be voided here to prevent compilers from warning us that it is not used
 static u64 EstimateBlockTimerFreq(void)
 {
+    (void)&EstimateCPUTimerFreq; // NOTE(casey): This has to be voided here to prevent compilers from warning us that it is not used
+    
 	u64 MillisecondsToWait = 100;
 	u64 OSFreq = GetOSTimerFreq();
 
