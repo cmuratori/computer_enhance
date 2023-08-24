@@ -77,6 +77,8 @@ static buffer ReadEntireFile(char *FileName)
                 FreeBuffer(&Result);
             }
         }
+        
+        fclose(File);
     }
     else
     {

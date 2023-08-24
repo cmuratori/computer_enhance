@@ -11,7 +11,7 @@
    ======================================================================== */
 
 /* ========================================================================
-   LISTING 80
+   LISTING 101
    ======================================================================== */
 
 /* NOTE(casey): _CRT_SECURE_NO_WARNINGS is here because otherwise we cannot
@@ -46,10 +46,11 @@ struct haversine_pair
     f64 X1, Y1;
 };
 
-#include "listing_0076_simple_profiler.cpp"
+#define PROFILER 1
+#include "listing_0100_bandwidth_profiler.cpp"
 #include "listing_0065_haversine_formula.cpp"
 #include "listing_0068_buffer.cpp"
-#include "listing_0079_timedblock_lookup_json_parser.cpp"
+#include "listing_0094_profiled_lookup_json_parser.cpp"
 
 static buffer ReadEntireFile(char *FileName)
 {
@@ -71,6 +72,7 @@ static buffer ReadEntireFile(char *FileName)
         Result = AllocateBuffer(Stat.st_size);
         if(Result.Data)
         {
+            TimeBandwidth("fread", Result.Count);
             if(fread(Result.Data, Result.Count, 1, File) != 1)
             {
                 fprintf(stderr, "ERROR: Unable to read \"%s\".\n", FileName);
@@ -90,7 +92,7 @@ static buffer ReadEntireFile(char *FileName)
 
 static f64 SumHaversineDistances(u64 PairCount, haversine_pair *Pairs)
 {
-    TimeFunction;
+    TimeBandwidth(__func__, PairCount*sizeof(haversine_pair));
     
     f64 Sum = 0;
     
@@ -181,4 +183,4 @@ int main(int ArgCount, char **Args)
     return Result;
 }
 
-static_assert(__COUNTER__ < ArrayCount(profiler::Anchors), "Number of profile points exceeds size of profiler::Anchors array");
+ProfilerEndOfCompilationUnit;
