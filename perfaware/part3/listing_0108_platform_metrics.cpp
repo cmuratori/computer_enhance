@@ -64,6 +64,7 @@ static void InitializeOSMetrics(void)
 
 #include <x86intrin.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
 static u64 GetOSTimerFreq(void)
 {
@@ -83,9 +84,13 @@ static u64 ReadOSTimer(void)
 
 static u64 ReadOSPageFaultCount(void)
 {
-    // TODO(casey): The course materials are not tested on MacOS/Linux, so only Windows
-    // code is provided for system query functions;
-    return 0;
+    // NOTE: ru_minflt  the number of page faults serviced without any I/O activity.
+    //       ru_majflt  the number of page faults serviced that required I/O activity.
+    struct rusage Usage = {};
+    getrusage(RUSAGE_SELF, &Usage);
+    int Result = Usage.ru_minflt + Usage.ru_majflt;
+    return Result;
+}
 }
 
 static void InitializeOSMetrics(void)
