@@ -201,10 +201,10 @@ int main(void)
 {
     printf("Circular buffer test:\n");
     
-    s32 Size = 64*4096;
-    circular_buffer Circular = AllocateCircularBuffer(Size, 3);
+    circular_buffer Circular = AllocateCircularBuffer(64*4096, 3);
     if(IsValid(Circular))
     {
+        s32 Size = (s32)Circular.Base.Count;
         u8 *Data = Circular.Base.Data + Size;
         Data[0] = 123;
         
