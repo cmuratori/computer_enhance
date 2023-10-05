@@ -81,7 +81,7 @@ static tracked_buffer AllocateTrackedBuffer(u64 MinimumSize)
 	// are total pages in the requested buffer size.
     SYSTEM_INFO Info;
     GetSystemInfo(&Info);
-    u64 PageCount = ((MinimumSize + Info.dwPageSize + 1) / Info.dwPageSize);
+    u64 PageCount = ((MinimumSize + Info.dwPageSize - 1) / Info.dwPageSize);
     
     Result.Base.Count = MinimumSize;
     Result.Base.Data = (u8 *)VirtualAlloc(0, MinimumSize, MEM_RESERVE|MEM_COMMIT|MEM_WRITE_WATCH, PAGE_READWRITE);
