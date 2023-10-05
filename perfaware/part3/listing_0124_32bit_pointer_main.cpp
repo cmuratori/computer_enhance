@@ -112,6 +112,12 @@ static p32<void> Allocate32BPCompatible(u32 MinimumSize)
     }
     else
     {
+        /* NOTE(casey): I've included this code for reference, just to show that it can work without
+           the new APIs. However, it is not code I would ever consider shipping. It just hunts for addresses
+           under 4GB to try to allocate, and makes no attempt to intelligently map that space or track what it has
+           already used. So it is unnecessarily quite slow, and is very limited in that it has a much
+           larger granularity than the Windows' own 64k restriction.
+        */
         for(u32 BasePage = 64; !Result.Value && (BasePage < 65536); BasePage += 64)
         {
             Result.Value = (u32)(u64)VirtualAlloc((PVOID)(u64)(BasePage*64*1024), MinimumSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
@@ -153,3 +159,4 @@ int main(void)
     
     return 0;
 }
+        
