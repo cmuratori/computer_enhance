@@ -1,14 +1,20 @@
-## What this is
+# What this is
 
 Repo of my homework from the course `Computer, enhance!`.
 
 I have tried to complete the tasks in at least two different languages. The goal is to add more as time goes by, in order to have more samples to profile and compare timings from.
 
+## Notes from the lectures
+
+[1: Welcome to the course](prologue/prologue-1.md)
+
+## Homework
+
 ### 1: Instruction stream encoding/decoding
 
-First make a binary instruction stream in `.asm`. And then decode it. For the decoding we write a program in our chosen language that can read binary files and disassemble them.
+The first assignment is: Make a binary instruction stream in `.asm`, and then decode it. For the decoding we write a program in our chosen language that can read binary files and disassemble them.
 
-From Table 4-12 in [8086 Family User's Manual - Page 165](https://edge.edx.org/c4x/BITSPilani/EEE231/asset/8086_family_Users_Manual_1_.pdf#page=165) we know that a register-to-register copy in binary is `1 0 0 0 1 0 d w`. The first 6 bits specifies the opcode, here it signifies the "mov" operation.
+From Table 4-12 in [8086 Family User's Manual - Page 165](https://edge.edx.org/c4x/BITSPilani/EEE231/asset/8086_family_Users_Manual_1_.pdf#page=165) we know that a register-to-register copy in binary is `1 0 0 0 1 0 d w`. The first 6 bits specifies the opcode. In our present case this signifies the "mov" operation.
 
 The D (direction) field sets the direction of the mov. 1/0 is to-from destination register. Since we are moving _from_ source register _to_ destination register, our value becomes `D=1`.
 
