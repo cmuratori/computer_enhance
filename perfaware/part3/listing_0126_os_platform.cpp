@@ -97,11 +97,13 @@ static void InitializeOSPlatform(void)
 
 #include <x86intrin.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
 struct os_platform
 {
     b32 Initialized;
     u64 CPUTimerFreq;
+    u64 LargePageSize; // NOTE(casey): This will be 0 when large pages are not supported (which is most of the time!)
 };
 static os_platform GlobalOSPlatform;
 
@@ -143,6 +145,7 @@ static void InitializeOSPlatform(void)
     {
         GlobalOSPlatform.Initialized = true;
         GlobalOSPlatform.CPUTimerFreq = EstimateCPUTimerFreq();
+        GlobalOSPlatform.LargePageSize = 2048 * 1024;
     }
 }
 

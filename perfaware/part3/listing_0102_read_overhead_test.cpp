@@ -14,9 +14,11 @@
    LISTING 102
    ======================================================================== */
 
+#if _WIN32
 #include <windows.h>
-#include <fcntl.h>
 #include <io.h>
+#endif
+#include <fcntl.h>
 
 struct read_parameters
 {
@@ -56,6 +58,8 @@ static void ReadViaFRead(repetition_tester *Tester, read_parameters *Params)
         }
     }
 }
+
+#if _WIN32
 
 static void ReadViaRead(repetition_tester *Tester, read_parameters *Params)
 {
@@ -149,3 +153,4 @@ static void ReadViaReadFile(repetition_tester *Tester, read_parameters *Params)
         }
     }
 }
+#endif
