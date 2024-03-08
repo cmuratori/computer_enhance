@@ -33,8 +33,8 @@ pub fn build(b: *std.Build) void {
     // In "production" Zig, you wouldn't use relatives paths. You'd add the
     // sim86 library files to a `vendor` or `third_party` directory and source
     // from there.
-    lib.addIncludePath("..");
-    lib.addCSourceFile("../../sim86_lib.cpp", &.{});
+    lib.addIncludePath(.{ .path = ".." });
+    lib.addCSourceFile(.{ .file = .{ .path = "../../sim86_lib.cpp" }, .flags = &[_][]const u8{} });
     lib.linkLibCpp();
     lib.installHeader("../sim86_shared.h", "sim86_shared.h");
 

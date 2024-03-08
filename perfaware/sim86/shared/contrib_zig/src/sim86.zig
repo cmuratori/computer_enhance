@@ -265,7 +265,7 @@ pub fn get8086InstructionTable() InstructionTable {
 
 pub fn decode8086Instruction(source: []u8) !Instruction {
     var decoded: Instruction = undefined;
-    Sim86_Decode8086Instruction(@intCast(c_uint, source.len), source.ptr, &decoded);
+    Sim86_Decode8086Instruction(@as(c_uint, @intCast(source.len)), source.ptr, &decoded);
     if (decoded.Op == OperationType.Op_None) {
         return DecodeError.UnrecognizedInstruction;
     }
