@@ -53,8 +53,10 @@ struct test_function
 test_function TestFunctions[] =
 {
     {"fread", ReadViaFRead},
+#if _WIN32
     {"_read", ReadViaRead},
     {"ReadFile", ReadViaReadFile},
+#endif
 };
 
 int main(int ArgCount, char **Args)

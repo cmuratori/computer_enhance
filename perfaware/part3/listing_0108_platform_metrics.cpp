@@ -64,6 +64,7 @@ static void InitializeOSMetrics(void)
 
 #include <x86intrin.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
 static u64 GetOSTimerFreq(void)
 {

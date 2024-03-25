@@ -87,13 +87,13 @@ static void PrintValue(char const *Label, repetition_value Value, u64 CPUTimerFr
     if(CPUTimerFreq)
     {
         f64 Seconds = SecondsFromCPUTime(E[RepValue_CPUTimer], CPUTimerFreq);
-        printf(" (%fms)", 1000.0f*Seconds);
+        printf(" (%8.3fms)", 1000.0f*Seconds);
     
         if(E[RepValue_ByteCount] > 0)
         {
             f64 Gigabyte = (1024.0f * 1024.0f * 1024.0f);
             f64 Bandwidth = E[RepValue_ByteCount] / (Gigabyte * Seconds);
-            printf(" %fgb/s", Bandwidth);
+            printf(" %9.4fgb/s", Bandwidth);
         }
     }
 
@@ -146,6 +146,7 @@ static void NewTestWave(repetition_tester *Tester, u64 TargetProcessedByteCount,
 
     Tester->TryForTime = SecondsToTry*CPUTimerFreq;
     Tester->TestsStartedAt = ReadCPUTimer();
+    //printf("\n"); // Move to the next line to start the live Min reporting.
 }
 
 static void BeginTime(repetition_tester *Tester)
@@ -215,8 +216,14 @@ static b32 IsTesting(repetition_tester *Tester)
                     
                     if(Tester->PrintNewMinimums)
                     {
+#if !_WIN32
+                        printf("\033[2K\r");
+#endif
                         PrintValue("Min", Results->Min, Tester->CPUTimerFreq);
+#if _WIN32
                         printf("                                   \r");
+#endif
+                        fflush(stdout);
                     }
                 }
                 
