@@ -110,10 +110,23 @@ static void InitializeOSPlatform(void)
     }
 }
 
+static void *OSAllocate(size_t ByteCount)
+{
+    void *Result = VirtualAlloc(0, ByteCount, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+    return Result;
+}
+
+static void OSFree(size_t ByteCount, void *BaseAddress)
+{
+    (void)ByteCount; // NOTE(casey): On Windows, you don't pass the size when deallocating
+    VirtualFree(BaseAddress, 0, MEM_RELEASE);
+}
+
 #else
 
 #include <x86intrin.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 
 struct os_platform
 {
@@ -180,6 +193,17 @@ static void InitializeOSPlatform(void)
         GlobalOSPlatform.Initialized = true;
         GlobalOSPlatform.CPUTimerFreq = EstimateCPUTimerFreq();
     }
+}
+
+static void *OSAllocate(size_t ByteCount)
+{
+    void *Result = mmap(0, ByteCount, PROT_READ|PROT_WRITE, MAP_ANONYMOUS, 0, 0);
+    return Result;
+}
+
+static void OSFree(size_t ByteCount, void *BaseAddress)
+{
+    munmap(BaseAddress, ByteCount);
 }
 
 #endif

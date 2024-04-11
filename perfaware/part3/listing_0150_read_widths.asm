@@ -57,7 +57,7 @@ Read_16x2:
 	align 64
 .loop:
     vmovdqu xmm0, [rdx]
-    vmovdqu xmm1, [rdx + 16]
+    vmovdqu xmm0, [rdx + 16]
     add rax, 32
     cmp rax, rcx
     jb .loop
@@ -68,7 +68,7 @@ Read_32x2:
 	align 64
 .loop:
     vmovdqu ymm0, [rdx]
-    vmovdqu ymm1, [rdx + 32]
+    vmovdqu ymm0, [rdx + 32]
     add rax, 64
     cmp rax, rcx
     jb .loop

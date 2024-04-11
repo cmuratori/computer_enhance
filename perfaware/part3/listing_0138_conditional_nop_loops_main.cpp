@@ -145,7 +145,9 @@ int main(void)
 {
     InitializeOSPlatform();
     
-    buffer Buffer = AllocateBuffer(1*1024*1024*1024);
+    // NOTE(casey): Allocate extra 8 bytes of overhang so we can use regular register mov's
+    u64 Count = 1*1024*1024*1024;
+    buffer Buffer = AllocateBuffer(Count + 8);
     if(IsValid(Buffer))
     {
         repetition_tester Testers[BranchPattern_Count][ArrayCount(TestFunctions)] = {};
@@ -161,14 +163,14 @@ int main(void)
                     test_function TestFunc = TestFunctions[FuncIndex];
                     
                     printf("\n--- %s, %s ---\n", TestFunc.Name, PatternName);
-                    NewTestWave(Tester, Buffer.Count, GetCPUTimerFreq());
+                    NewTestWave(Tester, Count, GetCPUTimerFreq());
                     
                     while(IsTesting(Tester))
                     {
                         BeginTime(Tester);
-                        TestFunc.Func(Buffer.Count, Buffer.Data);
+                        TestFunc.Func(Count, Buffer.Data);
                         EndTime(Tester);
-                        CountBytes(Tester, Buffer.Count);
+                        CountBytes(Tester, Count);
                     }
                 }
             }

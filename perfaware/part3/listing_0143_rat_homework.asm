@@ -22,14 +22,14 @@
     mov rcx, 3
     mov rdx, 4
     add rax, rbx
-    add rcx, rdx
-    add rax, rcx
+	add rcx, rdx
+	add rax, rcx
     mov rcx, rbx
-    inc rax
+	inc rax
     dec rcx
     sub rax, rbx
-    sub rcx, rdx
-    sub rax, rcx
+	sub rcx, rdx
+	sub rax, rcx
 
 ;
 ;  NOTE(casey): CHALLENGE MODE WITH ULTIMATE DIFFICULTY SETTINGS
@@ -39,7 +39,7 @@
 top:
     pop rcx
     sub rsp, rdx
-    mov rbx, rax
-    shl rbx, 0
-    not rbx
-    loopne top
+	mov rbx, rax
+	shl rbx, 0
+	not rbx
+	loopne top
