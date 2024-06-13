@@ -64,13 +64,13 @@ int main(void)
 {
     InitializeOSPlatform();
     
-    repetition_tester Testers[16][ArrayCount(TestFunctions)] = {};
+    repetition_tester Testers[32][ArrayCount(TestFunctions)] = {};
     u64 InnerLoopCounts[ArrayCount(Testers)] = {};
     
     buffer Buffer = AllocateBuffer(1*1024*1024*1024);
     if(IsValid(Buffer))
     {
-#define OuterLoopCount 262144
+#define OuterLoopCount (1024*1024)
         u64 CacheLineSize = 64;
         u64 TestSize = OuterLoopCount*CacheLineSize;
         
@@ -82,18 +82,25 @@ int main(void)
             // NOTE(casey): Make sure we don't get a collision in the random offsets
             u64 NextOffset = 0;
             u64 *NextPointer = 0;
+
+            u64 RandomValue = 0;
+            ReadOSRandomBytes(sizeof(RandomValue), &RandomValue);
+			b32 Found = false;
             for(u64 SearchIndex = 0; SearchIndex < CacheLineCount; ++SearchIndex)
             {
-                u64 RandomValue = 0;
-                ReadOSRandomBytes(sizeof(RandomValue), &RandomValue);
-        
-                NextOffset = RandomValue % CacheLineCount;
+				NextOffset = (RandomValue + SearchIndex) % CacheLineCount;
                 NextPointer = (u64 *)(Buffer.Data + NextOffset*CacheLineSize);
                 if(*NextPointer == 0)
                 {
+					Found = true;
                     break;
                 }
             }
+			
+			if(!Found)
+			{
+				fprintf(stderr, "ERROR: Unable to create single continuous pointer chain.\n");
+			}
             
             // NOTE(casey): Write the next pointer and some "data" to the cache line
             u64 *JumpData = (u64 *)(Buffer.Data + JumpOffset*CacheLineSize);
@@ -105,7 +112,12 @@ int main(void)
         
         for(u64 InnerLoopIndex = 0; InnerLoopIndex < ArrayCount(Testers); ++InnerLoopIndex)
         {
-            u64 InnerLoopCount = InnerLoopIndex ? (64*InnerLoopIndex) : 1;
+            u64 InnerLoopCount = 4*(InnerLoopIndex + 1);
+			if(InnerLoopIndex >= 16)
+			{
+				InnerLoopCount = (64*(InnerLoopIndex - 14));
+			}
+			
             InnerLoopCounts[InnerLoopIndex] = InnerLoopCount;
             
             for(u32 FuncIndex = 0; FuncIndex < ArrayCount(TestFunctions); ++FuncIndex)
