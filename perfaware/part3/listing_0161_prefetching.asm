@@ -37,14 +37,12 @@ PeriodicRead:
     mov rdx, [rdx]              ; Load the next block pointer out of the current block
     mov r10, r8                 ; Reset the inner loop counter
 
-    align 4
-
 .inner_loop:                    ; Do a loop of pretend operations on the "data"
     vpxor ymm0, ymm1
     vpaddd ymm0, ymm1
     dec r10
     jnz .inner_loop
-
+	
     dec rcx
     jnz .outer_loop
     ret
@@ -61,14 +59,13 @@ PeriodicPrefetchedRead:
     mov r10, r8                 ; Reset the inner loop counter
 
     prefetcht0 [rdx]            ; Start prefetching the next cache line while we work on this one
-    align 4
 
 .inner_loop:                    ; Do a loop of pretend operations on the "data"
     vpxor ymm0, ymm1
     vpaddd ymm0, ymm1
     dec r10
     jnz .inner_loop
-
+	
     dec rcx
     jnz .outer_loop
     ret
