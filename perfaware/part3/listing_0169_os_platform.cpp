@@ -218,6 +218,8 @@ inline void CloseMemoryMappedFile(memory_mapped_file *MappedFile)
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 struct os_platform
 {
@@ -335,8 +337,6 @@ inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
     
     if(Size)
     {
-        DWORD OffsetHigh = (DWORD)(Offset >> 32);
-        DWORD OffsetLow = (DWORD)(Offset & 0xffffffff);
         u8 *Data = (u8 *)mmap(0, Size, PROT_READ, MAP_SHARED, MappedFile->File, Offset);
         if(Data)
         {
@@ -348,7 +348,7 @@ inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
 
 inline b32 IsValid(memory_mapped_file MappedFile)
 {
-    b32 Result = (MappedFile->File >= 0);
+    b32 Result = (MappedFile.File >= 0);
     return Result;
 }
 
