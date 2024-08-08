@@ -329,6 +329,9 @@ inline memory_mapped_file OpenMemoryMappedFile(char const *FileName)
 
 inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
 {
+    // NOTE(casey): The course materials are not tested on MacOS/Linux. This is
+    // a sketch of what you would do to memory-map a file on those platforms.
+
     if(IsValid(MappedFile->Memory))
     {
         munmap(MappedFile->Memory.Data, MappedFile->Memory.Count);
@@ -337,8 +340,8 @@ inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
     
     if(Size)
     {
-        u8 *Data = (u8 *)mmap(0, Size, PROT_READ, MAP_SHARED, MappedFile->File, Offset);
-        if(Data)
+        u8 *Data = (u8 *)mmap(0, Size, PROT_READ, MAP_PRIVATE, MappedFile->File, Offset);
+        if(Data != MAP_FAILED)
         {
             MappedFile->Memory.Count = Size;
             MappedFile->Memory.Data = Data;
