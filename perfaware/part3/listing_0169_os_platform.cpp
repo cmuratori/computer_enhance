@@ -191,7 +191,7 @@ inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
 
 inline b32 IsValid(memory_mapped_file MappedFile)
 {
-    b32 Result = (MappedFile.Mapping != INVALID_HANDLE_VALUE);
+    b32 Result = (MappedFile.Mapping != 0);
     return Result;
 }
 
@@ -199,7 +199,7 @@ inline void CloseMemoryMappedFile(memory_mapped_file *MappedFile)
 {
     SetMapRegion(MappedFile, 0, 0);
 
-    if(MappedFile->Mapping != INVALID_HANDLE_VALUE)
+    if(MappedFile->Mapping)
     {
         CloseHandle(MappedFile->Mapping);
     }
