@@ -134,7 +134,7 @@ reference_answer RefTableSqrtX[] =
 
 inline void PrintDiffs(reference_answer Ref, math_func_array FuncArray)
 {
-    printf("  f(+%.16f) = %+.16f [reference]\n", Ref.Input, Ref.Output);
+    printf("  f(%+.16f) = %+.16f [reference]\n", Ref.Input, Ref.Output);
     for(u32 FuncIndex = 0; FuncIndex < FuncArray.Count; ++FuncIndex)
     {
         named_math_func Func = FuncArray.Funcs[FuncIndex];
