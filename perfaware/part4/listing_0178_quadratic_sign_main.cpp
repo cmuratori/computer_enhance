@@ -17,6 +17,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdlib.h>
 #include <intrin.h>
 
 typedef uint8_t u8;
@@ -70,20 +72,24 @@ static f64 IntrinSinQ(f64 ScalarX)
 
 int main(void)
 {
-    named_math_func SinFuncs[] =
+    f64 LowerBounds[] = {0, -Pi64};
+    for(u32 BoundIndex = 0; BoundIndex < ArrayCount(LowerBounds); ++BoundIndex)
     {
-        {"sin",sin},
-        {"SinQ",SinQ},
-        {"IntrinSinQ",IntrinSinQ},
-    };
-    
-    math_func_array SinFuncArray = {ArrayCount(SinFuncs), SinFuncs};
-    
-    printf("--- RANGE: [0, pi] ---\n");
-    SampleLargestDiff(sin, SinFuncArray, 0, Pi64);
-    
-    printf("--- RANGE: [-pi, pi] ---\n");
-    SampleLargestDiff(sin, SinFuncArray, -Pi64, Pi64);
+        math_tester Tester = {};
+        
+        f64 LowerBound = LowerBounds[BoundIndex];
+        printf("RANGE: [%+.24f, %+.24f]\n", LowerBound, Pi64);
+        
+        while(PrecisionTest(&Tester, LowerBound, Pi64))
+        {
+            f64 RefOutput = sin(Tester.InputValue);
+            TestResult(&Tester, RefOutput, SinQ(Tester.InputValue), "SinQ");
+            TestResult(&Tester, RefOutput, IntrinSinQ(Tester.InputValue), "IntrinSinQ");
+        }
+        
+        PrintResults(&Tester);
+        printf("\n");
+    }
     
     return 0;
 }

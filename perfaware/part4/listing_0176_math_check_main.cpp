@@ -17,6 +17,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 typedef uint8_t u8;
 typedef uint32_t u32;
@@ -61,27 +63,34 @@ static f64 SqrtCE(f64 X)
 
 int main(void)
 {
-    named_math_func SineFuncs[] = {{"sin",sin}, {"SinCE",SinCE}};
-    math_func_array SineFuncArray = {ArrayCount(SineFuncs), SineFuncs};
+    CheckHardCodedReference("sin", sin, ArrayCount(RefTableSinX), RefTableSinX);
+    CheckHardCodedReference("cos", cos, ArrayCount(RefTableCosX), RefTableCosX);
+    CheckHardCodedReference("asin", asin, ArrayCount(RefTableArcSinX), RefTableArcSinX);
+    CheckHardCodedReference("sqrt", sqrt, ArrayCount(RefTableSqrtX), RefTableSqrtX);
     
-    named_math_func CosineFuncs[] = {{"cos",cos}, {"CosCE",CosCE}};
-    math_func_array CosineFuncArray = {ArrayCount(CosineFuncs), CosineFuncs};
+    math_tester Tester = {};
     
-    named_math_func ArcSineFuncs[] = {{"asin",asin}, {"ASinCE",ASinCE}};
-    math_func_array ArcSineFuncArray = {ArrayCount(ArcSineFuncs), ArcSineFuncs};
-
-    named_math_func SquareRootFuncs[] = {{"sqrt",sqrt}, {"SqrtCE",SqrtCE}};
-    math_func_array SquareRootFuncArray = {ArrayCount(SquareRootFuncs), SquareRootFuncs};
+    while(PrecisionTest(&Tester, -Pi64, Pi64))
+    {
+        TestResult(&Tester, sin(Tester.InputValue), SinCE(Tester.InputValue), "SinCE");
+    }
     
-    CheckHardCodedReference("Sine", SineFuncArray, ArrayCount(RefTableSinX), RefTableSinX);
-    CheckHardCodedReference("Cosine", CosineFuncArray, ArrayCount(RefTableCosX), RefTableCosX);
-    CheckHardCodedReference("ArcSine", ArcSineFuncArray, ArrayCount(RefTableArcSinX), RefTableArcSinX);
-    CheckHardCodedReference("SquareRoot", SquareRootFuncArray, ArrayCount(RefTableSqrtX), RefTableSqrtX);
+    while(PrecisionTest(&Tester, -Pi64/2, Pi64/2))
+    {
+        TestResult(&Tester, cos(Tester.InputValue), CosCE(Tester.InputValue), "CosCE");
+    }
     
-    SampleLargestDiff(sin, SineFuncArray, -Pi64, Pi64);
-    SampleLargestDiff(cos, CosineFuncArray, -Pi64/2, Pi64/2);
-    SampleLargestDiff(asin, ArcSineFuncArray, 0, 1);
-    SampleLargestDiff(sqrt, SquareRootFuncArray, 0, 1);
+    while(PrecisionTest(&Tester, 0, 1))
+    {
+        TestResult(&Tester, asin(Tester.InputValue), ASinCE(Tester.InputValue), "ASinCE");
+    }
+    
+    while(PrecisionTest(&Tester, 0, 1))
+    {
+        TestResult(&Tester, sqrt(Tester.InputValue), SqrtCE(Tester.InputValue), "SqrtCE");
+    }
+    
+    PrintResults(&Tester);
     
     return 0;
 }

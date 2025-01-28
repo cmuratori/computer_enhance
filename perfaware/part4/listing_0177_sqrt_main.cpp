@@ -17,6 +17,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdlib.h>
 #include <intrin.h>
 
 typedef uint8_t u8;
@@ -65,16 +67,17 @@ static f64 ApproxSqrtCE(f64 ScalarX)
 
 int main(void)
 {
-    named_math_func SquareRootFuncs[] =
+    math_tester Tester = {};
+
+    while(PrecisionTest(&Tester, 0, 1))
     {
-        {"sqrt",sqrt},
-        {"SqrtCE",SqrtCE},
-        {"SqrtFCE",SqrtFCE},
-        {"ApproxSqrtCE",ApproxSqrtCE}
-    };
-    
-    math_func_array SquareRootFuncArray = {ArrayCount(SquareRootFuncs), SquareRootFuncs};
-    SampleLargestDiff(sqrt, SquareRootFuncArray, 0, 1);
-    
+        f64 RefOutput = sqrt(Tester.InputValue);
+        TestResult(&Tester, RefOutput, SqrtCE(Tester.InputValue), "SqrtCE");
+        TestResult(&Tester, RefOutput, SqrtFCE(Tester.InputValue), "SqrtFCE");
+        TestResult(&Tester, RefOutput, ApproxSqrtCE(Tester.InputValue), "ApproxSqrtCE");
+    }
+        
+    PrintResults(&Tester);
+
     return 0;
 }

@@ -14,17 +14,34 @@
    LISTING 175
    ======================================================================== */
 
-typedef f64 math_func(f64 Input);
-struct named_math_func
+typedef double math_func(double);
+
+struct math_test_result
 {
-    char const *Name;
-    math_func *Address;
+    f64 TotalDiff;
+    f64 MaxDiff;
+    u32 DiffCount;
+    
+    f64 InputValueAtMaxDiff;
+    f64 OutputValueAtMaxDiff;
+    f64 ExpectedValueAtMaxDiff;
+    
+    char Label[64];
 };
 
-struct math_func_array
+struct math_tester
 {
-    u32 Count;
-    named_math_func *Funcs;
+    math_test_result Results[256];
+    math_test_result ErrorResult;
+    
+    u32 ResultCount;
+    u32 ProgressResultCount;
+
+    b32 Testing;
+    u32 StepIndex;
+    u32 ResultOffset;
+    
+    f64 InputValue;
 };
 
 struct reference_answer
@@ -33,7 +50,7 @@ struct reference_answer
     f64 Output;
 };
 
-/* NOTE(casey): 64-bit floationg point can't really get past 17 decimal
+/* NOTE(casey): 64-bit floating point can't really get past 17 decimal
    significant figures, so these constants are overkill. However, I've left
    them that way so that anyone who wants to copy the values will have
    extra precision in case they are using something with support for
@@ -132,54 +149,178 @@ reference_answer RefTableSqrtX[] =
     {0.051231188245869981, 0.22634307642574353990563961017436878164407501492708325367084901372998301},
 };
 
-inline void PrintDiffs(reference_answer Ref, math_func_array FuncArray)
+inline f64 GetAvgDiff(math_test_result From)
 {
-    printf("  f(%+.16f) = %+.16f [reference]\n", Ref.Input, Ref.Output);
-    for(u32 FuncIndex = 0; FuncIndex < FuncArray.Count; ++FuncIndex)
+    f64 Result = (From.DiffCount) ? (From.TotalDiff / (f64)From.DiffCount) : 0;
+    return Result;
+}
+
+inline void PrintDecimalBars(void)
+{
+    printf("   ________________             ________________\n");
+}
+    
+inline void PrintResult(math_test_result Result)
+{
+    printf("%+.24f (%+.24f) at %+.24f [%s] \n", Result.MaxDiff, GetAvgDiff(Result), Result.InputValueAtMaxDiff, Result.Label);
+}
+
+inline b32 PrecisionTest(math_tester *Tester, f64 MinInputValue, f64 MaxInputValue, u32 StepCount = 100000000)
+{
+    if(Tester->Testing)
     {
-        named_math_func Func = FuncArray.Funcs[FuncIndex];
-        f64 Output = Func.Address(Ref.Input);
-        printf("                         = %+.16f (%+.16f) [%s]\n", Output, Ref.Output - Output, Func.Name);
+        ++Tester->StepIndex;
+    }
+    else
+    {
+        // NOTE(casey): This is a new test
+        Tester->Testing = true;
+        Tester->StepIndex = 0;
+    }
+
+    if(Tester->StepIndex < StepCount)
+    {
+        Tester->ResultOffset = 0;
+        
+        f64 tStep = (f64)Tester->StepIndex / (f64)(StepCount - 1);
+        Tester->InputValue = (1.0 - tStep)*MinInputValue + tStep*MaxInputValue;
+    }
+    else
+    {
+        Tester->ResultCount += Tester->ResultOffset;
+        if(Tester->ResultCount > ArrayCount(Tester->Results))
+        {
+            Tester->ResultCount = ArrayCount(Tester->Results);
+            fprintf(stderr, "Out of room to store math test results.\n");
+        }
+        
+        if(Tester->ProgressResultCount < Tester->ResultCount)
+        {
+            PrintDecimalBars();
+            while(Tester->ProgressResultCount < Tester->ResultCount)
+            {
+                PrintResult(Tester->Results[Tester->ProgressResultCount++]);
+            }
+        }
+        
+        Tester->Testing = false;
+    }
+    
+    b32 Result = Tester->Testing;
+    return Result;
+}
+
+inline void TestResult(math_tester *Tester, f64 Expected, f64 Output, char const *Format, ...)
+{
+    u32 ResultIndex = Tester->ResultCount + Tester->ResultOffset;
+    math_test_result *Result = &Tester->ErrorResult;
+    if(ResultIndex < ArrayCount(Tester->Results))
+    {
+        Result = Tester->Results + ResultIndex;
+    }
+    
+    if(Tester->StepIndex == 0)
+    {
+        *Result = {};
+        va_list ArgList;
+        va_start(ArgList, Format);
+        vsnprintf(Result->Label, sizeof(Result->Label), Format, ArgList);
+        va_end(ArgList);
+    }
+    
+    f64 Diff = fabs(Expected - Output);
+    Result->TotalDiff += Diff;
+    ++Result->DiffCount;
+    
+    if(Result->MaxDiff < Diff)
+    {
+        Result->MaxDiff = Diff;
+        Result->InputValueAtMaxDiff = Tester->InputValue;
+        Result->OutputValueAtMaxDiff = Output;
+        Result->ExpectedValueAtMaxDiff = Expected;
+    }
+    
+    ++Tester->ResultOffset;
+}
+    
+inline int MathCmpGT(void *Context, const void *AIndex, const void *BIndex)
+{
+    math_tester *Tester = (math_tester *)Context;
+    
+    math_test_result *A = Tester->Results + (*(u32 *)AIndex);
+    math_test_result *B = Tester->Results + (*(u32 *)BIndex);
+    
+    int Result = 0;
+    if(A->MaxDiff > B->MaxDiff)
+    {
+        Result = 1;
+    }
+    else if(A->MaxDiff < B->MaxDiff)
+    {
+        Result = -1;
+    }
+    else if(A->TotalDiff > B->TotalDiff)
+    {
+        Result = 1;
+    }
+    else if(A->TotalDiff < B->TotalDiff)
+    {
+        Result = -1;
+    }
+    
+    return Result;
+}
+
+inline void PrintResults(math_tester *Tester)
+{
+    if(Tester->ResultCount)
+    {
+        printf("\nSorted by maximum error:\n");
+        
+        PrintDecimalBars();
+
+        u32 Ranking[ArrayCount(Tester->Results)];
+        for(u32 ResultIndex = 0; ResultIndex < Tester->ResultCount; ++ResultIndex)
+        {
+            Ranking[ResultIndex] = ResultIndex;
+        }
+        
+        qsort_s(Ranking, Tester->ResultCount, sizeof(Ranking[0]), MathCmpGT, Tester);
+        
+        for(u32 ResultIndex = 0; ResultIndex < Tester->ResultCount; ++ResultIndex)
+        {
+            math_test_result Result = Tester->Results[Ranking[ResultIndex]];
+            
+            printf("%+.24f (%+.24f) [%s", Result.MaxDiff, GetAvgDiff(Result), Result.Label);
+            while((ResultIndex + 1) < Tester->ResultCount)
+            {
+                math_test_result NextResult = Tester->Results[Ranking[ResultIndex + 1]];
+                if((NextResult.MaxDiff == Result.MaxDiff) &&
+                   (NextResult.TotalDiff == Result.TotalDiff))
+                {
+                    printf(", %s", NextResult.Label);
+                    ++ResultIndex;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            printf("]\n");
+        }
     }
 }
 
-inline void CheckHardCodedReference(char const *Label, math_func_array FuncArray, u32 RefCount, reference_answer *Refs)
+inline void CheckHardCodedReference(char const *Label, math_func *Func, u32 RefCount, reference_answer *Refs)
 {
     printf("%s:\n", Label);
     for(u32 RefIndex = 0; RefIndex < RefCount; ++RefIndex)
     {
         reference_answer Ref = Refs[RefIndex];
-        PrintDiffs(Ref, FuncArray);
+
+        printf("  f(%+.24f) = %+.24f [reference]\n", Ref.Input, Ref.Output);
+        f64 Output = Func(Ref.Input);
+        printf("                                 = %+.24f (%+.24f) [%s]\n", Output, Ref.Output - Output, Label);
     }
     printf("\n");
-}
-
-inline void SampleLargestDiff(math_func *RefFunc, math_func_array FuncArray, f64 MinInput, f64 MaxInput, u32 StepCount = 100000000)
-{
-    for(u32 FuncIndex = 0; FuncIndex < FuncArray.Count; ++FuncIndex)
-    {
-        named_math_func Func = FuncArray.Funcs[FuncIndex];
-        
-        f64 LargestDiffAtInput = 0;
-        f64 LargestDiff = 0;
-        for(u32 StepIndex = 0; StepIndex < StepCount; ++StepIndex)
-        {
-            f64 tStep = (f64)StepIndex / (f64)(StepCount - 1);
-            f64 Input = (1.0 - tStep)*MinInput + tStep*MaxInput;
-            
-            f64 Diff = fabs(RefFunc(Input) - Func.Address(Input));
-            if(LargestDiff < Diff)
-            {
-                LargestDiff = Diff;
-                LargestDiffAtInput = Input;
-            }
-        }
-    
-        reference_answer Ref = {};
-        Ref.Input = LargestDiffAtInput;
-        Ref.Output = RefFunc(Ref.Input);
-        
-        printf("Largest diff for %s:\n", Func.Name);
-        PrintDiffs(Ref, FuncArray);
-    }
 }
