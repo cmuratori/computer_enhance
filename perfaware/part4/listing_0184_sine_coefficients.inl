@@ -39,10 +39,7 @@ static f64 SineRadiansC_Taylor[16] =
 
 static f64 SineRadiansC_MFTWP[][11] =
 {
-    // NOTE(casey): This minimax coefficient table was created by Demetri Spanos as part of his
-    // course, "Math for the Working Programmer". If you'd like to learn how these coefficients
-    // were made, and a whole lot of other practical math for programmers, check out:
-    // https://math-for-the-working-programmer.com
+    // NOTE(casey): This minimax coefficient table was donated by Demetri Spanos
     
     {},
     {},
