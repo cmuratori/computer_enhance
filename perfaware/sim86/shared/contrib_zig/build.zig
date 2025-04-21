@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
         .name = "contrib_zig",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
-        .root_source_file = .{ .path = "src/sim86.zig" },
+        .root_source_file = b.path("src/sim86.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -33,10 +33,10 @@ pub fn build(b: *std.Build) void {
     // In "production" Zig, you wouldn't use relatives paths. You'd add the
     // sim86 library files to a `vendor` or `third_party` directory and source
     // from there.
-    lib.addIncludePath(.{ .path = ".." });
-    lib.addCSourceFile(.{ .file = .{ .path = "../../sim86_lib.cpp" }, .flags = &[_][]const u8{} });
+    lib.addIncludePath(b.path(".."));
+    lib.addCSourceFile(.{ .file = b.path("../../sim86_lib.cpp"), .flags = &[_][]const u8{} });
     lib.linkLibCpp();
-    lib.installHeader("../sim86_shared.h", "sim86_shared.h");
+    lib.installHeader(b.path("../sim86_shared.h"), "sim86_shared.h");
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
@@ -45,7 +45,7 @@ pub fn build(b: *std.Build) void {
 
     // Creates a step for unit testing.
     const main_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/sim86_test.zig" },
+        .root_source_file = b.path("src/sim86_test.zig"),
         .target = target,
         .optimize = optimize,
     });

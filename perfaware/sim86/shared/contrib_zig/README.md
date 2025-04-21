@@ -9,7 +9,7 @@ to build the C++ shared library and then interface with it via the
 
 ## Building and running
 
-Tested Zig Version: `0.11.0`
+Tested Zig Version: `0.14.0`
 
 To run the test file:
 
