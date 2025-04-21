@@ -252,8 +252,8 @@ const example_disassembly = [_]u8{
 };
 
 fn makeExampleDisassemblyCopy(allocator: std.mem.Allocator) ![]u8 {
-    var copy = try allocator.alloc(u8, 247);
-    std.mem.copy(u8, copy, &example_disassembly);
+    const copy = try allocator.alloc(u8, 247);
+    std.mem.copyForwards(u8, copy, &example_disassembly);
     return copy;
 }
 
@@ -269,7 +269,7 @@ test "get8086InstructionTable" {
 test "decode8086Instruction/mnemonicFromOperationType" {
     const allocator = std.testing.allocator;
 
-    var mem = try makeExampleDisassemblyCopy(allocator);
+    const mem = try makeExampleDisassemblyCopy(allocator);
     defer allocator.free(mem);
 
     var decoded = try sim86.decode8086Instruction(mem);
