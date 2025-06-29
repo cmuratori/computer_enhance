@@ -15,7 +15,11 @@
    ======================================================================== */
 
 #include <math.h>
+#if _WIN32
 #include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
 typedef int unsigned u32;
 typedef double f64;
