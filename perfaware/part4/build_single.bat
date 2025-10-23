@@ -9,8 +9,8 @@ where /q cl && (
 )
 
 where /q clang++ && (
-  call clang++ -mavx2 -g -Wall -fuse-ld=lld ..\%1 -o %~n1_dc.exe
-  call clang++ -mavx2 -O3 -g -Wall -fuse-ld=lld ..\%1 -o %~n1_rc.exe
+  call clang++ -mavx2 -mfma -g -Wall -fuse-ld=lld ..\%1 -o %~n1_dc.exe
+  call clang++ -mavx2 -mfma -O3 -g -Wall -fuse-ld=lld ..\%1 -o %~n1_rc.exe
 )
 
 popd
