@@ -95,9 +95,8 @@ static void UnsetTest(u32 RepCount)
 {
     for(u32 Rep = 0; Rep < RepCount; ++Rep)
     {
-        f64 Value = 0.5;
-        
-        PretendToWriteF64(Value);
+        f64 Value = 0;
+        PretendToWrite(Value);
         f64 Result = ArcsineCoreFromSquared(Value);
         PretendToRead(Result);
     }
@@ -107,8 +106,8 @@ static void SetTest(u32 RepCount)
 {
     for(u32 Rep = 0; Rep < RepCount; ++Rep)
     {
-        f64 Value;
-        ForceCompilerToSetF64(Value, 0.5);
+        f64 Value = 0.5;
+        PretendToWrite(Value);
         f64 Result = ArcsineCoreFromSquared(Value);
         PretendToRead(Result);
     }

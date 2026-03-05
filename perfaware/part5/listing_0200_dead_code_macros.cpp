@@ -15,12 +15,10 @@
    ======================================================================== */
 
 #if defined(__clang__) || defined(__GNUC__)
-#define PretendToWriteF64(Variable) asm volatile ("vpxor %0,%0,%0" : "=x"(Variable))
-#define ForceCompilerToSetF64(Variable, Value) asm volatile ("vmovsd %1,%0" : "=x"(Variable) : "g"(Value))
-#define PretendToRead(Variable) asm volatile ("" : : "x"(Variable))
+#define PretendToWrite(Variable) asm volatile ("" : "+v"(Variable))
+#define PretendToRead(Variable) asm volatile ("" : : "v"(Variable))
 #else
-#define PretendToWriteF64(Variable) (void)(Variable)
-#define ForceCompilerToSetF64(Variable, Value) (Variable) = (Value)
+#define PretendToWrite(Variable) (void)(Variable)
 #define PretendToRead(Variable) (void)(Variable)
 #pragma message("WARNING: Dead code macros are not available on this compiler.")
 #endif
