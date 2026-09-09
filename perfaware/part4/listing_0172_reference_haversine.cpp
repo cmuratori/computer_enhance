@@ -38,7 +38,7 @@ struct haversine_setup
     haversine_pair *Pairs;
     f64 *Answers;
     
-    f64 SumAnswer;
+    f64 AverageAnswer;
     
     b32 Valid;
 };
@@ -166,7 +166,7 @@ static haversine_setup SetUpHaversine(char *PairsJSONFileName, char *AnswerFileN
         {
             Result.PairCount = PairCount;
             Result.Answers = (f64 *)Result.AnswerBuffer.Data;
-            Result.SumAnswer = Result.Answers[PairCount];
+            Result.AverageAnswer = Result.Answers[PairCount];
             
             Result.ParsedByteCount = (sizeof(haversine_pair)*Result.PairCount);
             
@@ -174,6 +174,11 @@ static haversine_setup SetUpHaversine(char *PairsJSONFileName, char *AnswerFileN
             fprintf(stdout, "Source JSON: %llumb\n", Result.JSONBuffer.Count/Megabyte);
             fprintf(stdout, "Parsed: %llumb (%llu pairs)\n", Result.ParsedByteCount/Megabyte, Result.PairCount);
             
+            if (Result.PairCount == 0)
+            {
+                fprintf(stderr, "ERROR: Test data is empty.\n");
+            }
+
             Result.Valid = (Result.PairCount != 0);
         }
         else
