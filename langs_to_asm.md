@@ -120,6 +120,38 @@ instructions may work for LLVM's objdump too.
 objdump -d --demangle test > test_disassembly.asm
 ```
 
+# Languages with built-in ASM listings
+
+Some languages produce annotated assembly listings directly from the compiler, without requiring a separate disassembly tool.
+
+### AILang
+
+[AILang](https://github.com/AiLang-Author/Ailang-Self-Hosting-) is a self-hosted systems programming language that compiles directly to x86_64 machine code. The compiler produces source-annotated ASM listings alongside the binary during compilation.
+
+* To compile and emit an ASM listing (program functions only):
+```
+ailang.x -asm your_program.ailang
+```
+This writes `your_program.asm` beside the executable. Each source line appears as a comment above the instructions it emitted, with raw instruction bytes shown in hex:
+```
+; your_program.ailang:4    PrintMessage("Hello, World!\n")
+    48 C7 C7 01 00 00 00 MOV rdi, 1
+    48 BE 00 10 40 00 00 00 00 00 MOV rsi, data
+    48 C7 C2 0E 00 00 00 MOV rdx, 14
+    48 C7 C0 01 00 00 00 MOV rax, 1
+    0F 05 SYSCALL
+```
+
+* To include library function bodies in the listing:
+```
+ailang.x -asm-all your_program.ailang
+```
+
+* To tree-shake unreachable functions before listing (useful for isolating only the code that matters):
+```
+ailang.x -TS -asm your_program.ailang
+```
+
 # If you'd like to contribute a new language or method...
 
 ... please submit a pull request! Note that in order to be included here, you must provide comprehensive instructions that allow someone to either step through or conveniently view the assembly language output of a program snippet.
