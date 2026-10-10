@@ -5,7 +5,7 @@ edition = "2021"
 
 [build-dependencies]
 cc = "1.0.79"
-bindgen = "0.64.0"
+bindgen = "0.73.0"
 
 [lib]
 name = "sim86_shared"
