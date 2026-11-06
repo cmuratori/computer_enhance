@@ -252,28 +252,28 @@ const example_disassembly = [_]u8{
 };
 
 fn makeExampleDisassemblyCopy(allocator: std.mem.Allocator) ![]u8 {
-    var copy = try allocator.alloc(u8, 247);
-    std.mem.copy(u8, copy, &example_disassembly);
+    const copy = try allocator.alloc(u8, 247);
+    std.mem.copyForwards(u8, copy, &example_disassembly);
     return copy;
 }
 
 test "sim86GetVersion" {
-    try std.testing.expectEqual(sim86.getVersion(), 3);
+    try std.testing.expectEqual(sim86.getVersion(), 4);
 }
 
 test "get8086InstructionTable" {
     const table = sim86.get8086InstructionTable();
-    try std.testing.expectEqual(@intCast(u32, 133), table.EncodingCount);
+    try std.testing.expectEqual(@as(u32, @intCast(133)), table.EncodingCount);
 }
 
 test "decode8086Instruction/mnemonicFromOperationType" {
     const allocator = std.testing.allocator;
 
-    var mem = try makeExampleDisassemblyCopy(allocator);
+    const mem = try makeExampleDisassemblyCopy(allocator);
     defer allocator.free(mem);
 
     var decoded = try sim86.decode8086Instruction(mem);
-    try std.testing.expectEqual(@intCast(u32, 2), decoded.Size);
+    try std.testing.expectEqual(@as(u32, 2), decoded.Size);
     try std.testing.expectEqual(sim86.InstructionFlag{ .Wide = true }, decoded.Flags);
     try std.testing.expectEqualStrings("add", sim86.mnemonicFromOperationType(decoded.Op));
     try std.testing.expectEqual(sim86.OperandType.OperandRegister, decoded.Operands[0].Type);

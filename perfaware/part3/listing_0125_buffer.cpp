@@ -56,10 +56,14 @@ inline b32 AreEqual(buffer A, buffer B)
     return true;
 }
 
+// NOTE(casey): Allocate/free call the platform layer
+static void *OSAllocate(size_t ByteCount);
+static void OSFree(size_t ByteCount, void *BaseAddress);
+
 inline buffer AllocateBuffer(size_t Count)
 {
     buffer Result = {};
-    Result.Data = (u8 *)malloc(Count);
+    Result.Data = (u8 *)OSAllocate(Count);
     if(Result.Data)
     {
         Result.Count = Count;
@@ -76,7 +80,7 @@ inline void FreeBuffer(buffer *Buffer)
 {
     if(Buffer->Data)
     {
-        free(Buffer->Data);
+        OSFree(Buffer->Count, Buffer->Data);
     }
     *Buffer = {};
 }
