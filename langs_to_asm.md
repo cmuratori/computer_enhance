@@ -22,6 +22,9 @@ If it supports machine code output for your language, Compiler Explorer is often
 | C / C++   | CLANG     | -O3 |
 | C#        | .NET      | |
 | ZIG       | ZIG       | -OReleaseFast / -OReleaseSmall / -OReleaseSafe |
+| Rust      | rustc     | -C opt-level=3 |
+
+For Rust, Compiler Explorer compiles your code as a library, so functions that are not `pub` and not called from anywhere are removed as dead code and will not show up in the output. Mark the functions you want to look at as `pub`.
 
 Note that not all languages supported by Compiler Explorer provide _actual_ ASM output. Some - like Python - only provide interpreter bytecode output, which is not particularly useful. The table above includes only those languages for which Compiler Explorer can produce real ASM.
 
@@ -35,6 +38,8 @@ To see source code along with reasonable ASM when using a debugger, you must ens
 | C / C++   | GCC       | -g -O3 |
 | C / C++   | CLANG     | -g -O3 |
 | ZIG       | ZIG       | -femit-asm -OReleaseFast |
+| Rust      | rustc     | -g -C opt-level=3 |
+| Rust      | cargo     | `cargo build --release` with `debug = true` under `[profile.release]` in Cargo.toml |
 
 Once you have an executable that has debug information _and_ optimizations enabled, you can load the executable into a debugger and step through the ASM using the instructions below:
 
@@ -78,6 +83,31 @@ settings set target.x86-disassembly-flavor intel
 settings set stop-disassembly-display always
 ```
 
+***Note for Rust:*** `b main` stops in the C runtime's `main`, before your code runs. To break in your own `main`, include the crate name, e.g. `b test::main` for a program compiled from `test.rs`. Functions in modules work the same way (`b mycrate::module::function`). You can also use `rust-lldb`, which ships with Rust and adds pretty-printing for Rust types.
+
+# Emitting ASM directly from the compiler
+
+Some compilers can write an ASM listing for you while compiling, which is convenient for looking at larger programs without a debugger.
+
+### Rust
+
+* To produce an ASM listing (in this case, "test.s") from a single file with Intel syntax, use:
+```
+rustc -C opt-level=3 --emit asm -C llvm-args=-x86-asm-syntax=intel test.rs
+```
+* With cargo, the listing is written to `target/release/deps/<crate name>-<hash>.s`:
+```
+cargo rustc --release -- --emit asm -C llvm-args=-x86-asm-syntax=intel
+```
+* Symbol names in these listings are mangled (e.g. `_RNvCs..._4test3sum`). To view a single function with demangled names, install [cargo-show-asm](https://github.com/pacak/cargo-show-asm), which uses Intel syntax by default:
+```
+cargo install cargo-show-asm
+cargo asm --release mycrate::sum
+```
+Pass `--rust` to interleave the Rust source with the ASM (this needs `rustup component add rust-src`).
+
+Note that, as with Compiler Explorer, small functions are often inlined into their callers and will not appear on their own. Add `#[inline(never)]` to a function if you want to look at it in isolation.
+
 # Dumping an executable to ASM
 
 Several command line utilities are available 
@@ -119,6 +149,7 @@ instructions may work for LLVM's objdump too.
 ```
 objdump -d --demangle test > test_disassembly.asm
 ```
+Add `-M intel` to get Intel syntax instead of the default AT&T syntax. `--demangle` also works for Rust symbol names.
 
 # If you'd like to contribute a new language or method...
 
