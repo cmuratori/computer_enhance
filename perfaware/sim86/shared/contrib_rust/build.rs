@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use std::env;
+use std::path::PathBuf;
 
 fn main() {
     let lib_path = PathBuf::from("../");
@@ -31,7 +31,7 @@ fn main() {
         .clang_arg("-x")
         .clang_arg("c++")
         .header("../sim86_shared.h")
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()
         .expect("Failed to generate bindings");
 
