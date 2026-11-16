@@ -95,14 +95,15 @@ Some compilers can write an ASM listing for you while compiling, which is conven
 ```
 rustc -C opt-level=3 --emit asm -C llvm-args=-x86-asm-syntax=intel test.rs
 ```
-* With cargo, the listing is written to `target/release/deps/<crate name>-<hash>.s`:
+* With cargo, pass the same flags through `cargo rustc`:
 ```
 cargo rustc --release -- --emit asm -C llvm-args=-x86-asm-syntax=intel
 ```
+The listing is a `.s` file somewhere under `target/release`. Where exactly depends on what is being built (library, binary, example, benchmark) and on the cargo version, so search that directory for it rather than relying on a fixed path.
 * Symbol names in these listings are mangled (e.g. `_RNvCs..._4test3sum`). To view a single function with demangled names, install [cargo-show-asm](https://github.com/pacak/cargo-show-asm), which uses Intel syntax by default:
 ```
 cargo install cargo-show-asm
-cargo asm --release mycrate::sum
+cargo asm mycrate::sum
 ```
 Pass `--rust` to interleave the Rust source with the ASM (this needs `rustup component add rust-src`).
 
