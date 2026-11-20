@@ -68,7 +68,7 @@ int main(int ArgCount, char **Args)
         repetition_test_series TestSeries = AllocateTestSeries(ArrayCount(TestFunctions), 1);
         if(IsValid(Setup) && IsValid(TestSeries))
         {
-            f64 ReferenceSum = Setup.SumAnswer;
+            f64 AverageAnswer = Setup.AverageAnswer;
             
             SetRowLabelLabel(&TestSeries, "Test");
             SetRowLabel(&TestSeries, "Haversine");
@@ -82,7 +82,8 @@ int main(int ArgCount, char **Args)
                 NewTestWave(&TestSeries, &Tester, Setup.ParsedByteCount, GetCPUTimerFreq());
                 
                 u64 IndividualErrorCount = Function.Verify(Setup);
-                u64 SumErrorCount = {};
+                u64 AverageErrorCount = {};
+                u64 Iterations = 0;
                 
                 while(IsTesting(&TestSeries, &Tester))
                 {
@@ -91,13 +92,13 @@ int main(int ArgCount, char **Args)
                     CountBytes(&Tester, Setup.ParsedByteCount);
                     EndTime(&Tester);
 
-                    SumErrorCount += !ApproxAreEqual(Check, ReferenceSum);
+                    AverageErrorCount += !ApproxAreEqual(Check, AverageAnswer);
                 }
                 
-                if(SumErrorCount || IndividualErrorCount)
+                if(AverageErrorCount || IndividualErrorCount)
                 {
-                    fprintf(stderr, "WARNING: %llu haversines mismatched, %llu sum mismatches\n",
-                            IndividualErrorCount, SumErrorCount);
+                    fprintf(stderr, "WARNING: %llu haversines mismatched, %llu averages mismatched (%llu iterations)\n",
+                            IndividualErrorCount, AverageErrorCount, Iterations);
                 }
             }
             
@@ -105,7 +106,7 @@ int main(int ArgCount, char **Args)
         }
         else
         {
-            fprintf(stderr, "ERROR: Test data size must be non-zero\n");
+            fprintf(stderr, "ERROR: Test data invalid.\n");
         }
         
         FreeHaversine(&Setup);
@@ -113,7 +114,10 @@ int main(int ArgCount, char **Args)
     }
     else
     {
-        fprintf(stderr, "Usage: %s [existing filename]\n", Args[0]);
+        fprintf(stderr, "Usage: %s PAIRS ANSWERS\n"
+          "where PAIRS is an existing JSON file with N coordinate pairs\n"
+          "and ANSWERS is an existing binary answers file with N haversine distances\n"
+          "followed by the average distance (8-byte floats).\n", Args[0]);
     }
 		
     return 0;
